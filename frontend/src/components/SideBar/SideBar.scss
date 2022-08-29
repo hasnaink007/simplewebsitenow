@@ -1,0 +1,164 @@
+@import "utils/theme.scss";
+
+.sidebar_container{
+	height:  100vh;
+	background: $primary;
+	color:  #fff;
+	position: relative;
+	width: 100%;
+	max-width: 300px;
+	&.collapsed{
+		width: auto;
+	}
+
+	@media screen and (max-width: 1275px){
+		position: fixed;
+		z-index: 99;
+
+		svg{
+			background-color: #00000030;
+		}
+	}
+
+	.sidebar_content{
+		width: 100%;
+		max-width: 300px;
+		
+		&.collapsed{
+			display: none;
+		}
+	}
+
+	.collapse_sidebar_btn{
+		position: absolute;
+		bottom: 10px;
+		right: -12px;
+		width: 12px;
+		height: 100%;
+		cursor: pointer;
+
+		@media ( max-width: 768px) {
+			width: 18px;
+			right: -18px;
+			padding: 0 3px;
+		}
+	}
+
+	.notes_preloader{
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		gap: 20px;
+		height: calc(100% - 70px);
+		align-items: center;
+	}
+
+	.notes_filter{
+		width: 100%;
+		
+		input{
+			width: 100%;
+			margin: 10px 0;
+			padding: 10px;
+			border: 0px;
+			background: rgb(65, 65, 65);
+			color: rgb(233, 233, 233);
+			font-size: 16px;
+			outline: none;
+		}
+	}
+	.sidebar_nav{
+		width: 100%;
+		overflow-y: scroll;
+		height: calc(100vh - 130px);
+
+		&::-webkit-scrollbar {
+		  width: 0px;
+		}
+	}
+
+	.logo_container{
+		display: flex;
+		justify-content: center;
+		padding: 10px;
+		align-items: center;
+		grid-gap: 10px;
+
+		.logo_name{
+			margin: 0px;
+
+			span{
+				color: $primary-dim;
+			}
+		}
+		img{
+			width: auto;
+			height: 45px;
+		}
+	}
+
+	.sidebar_pages_links{
+
+		a{
+			width: 100%;
+			outline: none;
+			display: block;
+			color:  #ededed;
+			font-size: 17px;
+			text-decoration: none;
+			border-bottom:  1px solid #cccccc50;
+			border-right: 4px solid transparent;
+			transition: .3s all ease;
+			padding: 15px 10px;
+			
+			&>div{
+				display: flex;
+				grid-gap: 10px;
+
+				small{
+					font-size: 10px;
+				}
+
+				&:first-child{
+					margin-bottom: 5px;
+				}
+			}
+			svg{
+				height: 25px;
+				width: 25px;
+				
+				&, path{
+					color: #fff;
+					stroke: #fff;
+				}
+			}
+			// &.selected_note, &.focused{
+			// 	background: #E35F1C80;
+			// 	border-right-color: #E35F1C;
+			// }
+			
+			&.selected_note, &:hover, &.active{
+				background: #ffb60040;
+				border-right-color: #ffb600;
+			}
+		}
+		.child_notes{
+			
+			.child_note{
+				display: flex;
+				&:hover{
+					background-color: #ffb60040;
+				}
+			}
+
+			.child_notes_left{
+				width: 20px;
+			}
+			.child_notes_right{
+				display: block;
+				width: 100%;
+			}
+		}
+	}
+}

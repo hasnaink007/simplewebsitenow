@@ -1,0 +1,22 @@
+{
+  "name": "simplewebsitenow",
+  "version": "1.0.0",
+  "description": "Create simple but awesome website for yourself",
+  "main": "ecosystem.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node frontend/scripts/start.js && node server/index.js",
+    "frontend": "node frontend/scripts/start.js",
+    "backend": "node server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasnaink007/simplewebsitenow"
+  },
+  "author": "Hasnain Khalid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hasnaink007/simplewebsitenow/issues"
+  },
+  "homepage": "https://github.com/hasnaink007/simplewebsitenow#readme"
+}

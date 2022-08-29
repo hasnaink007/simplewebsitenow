@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import "utils/theme.scss";
+
+* {
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  align-items: center;
+}
+// code[class*="language-"], pre[class*="language-"]{
+  // font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
+// }
+
+h1{
+  font-size: 42px;
+}
+h2{
+  font-size: 32px;
+}
+h3{
+  font-size: 26px;
+}
+h4{
+  font-size: 22px;
+}
+h5{
+  font-size: 18px;
+}
+h6{
+  font-size: 14px;
+}
+
+.main_wrapper_container{
+  display: flex;
+  height: 100vh;
+
+  &>.right_content{
+    width: 100%;
+
+    .content_container{
+      padding: 0px 15px;
+      overflow-y: auto;
+      height: 100vh;
+      background: $secondary;
+      color: #eee;
+
+      @media ( max-width: 768px) {
+        padding: 0px;
+      }
+
+      a{
+        color: #ed9b30;
+      }
+
+     /*  pre{
+        background: $primary !important;
+        border: 0px !important;
+        box-shadow: none !important;
+        border-radius: 10px !important;
+      }
+ */
+      &::-webkit-scrollbar {
+        width: 5px;
+      }
+      &::-webkit-scrollbar-track {
+        background: #ccc;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: $primary-dim;
+      }
+      &::-webkit-scrollbar-thumb:hover{
+        background: $primary;
+      }
+    }
+  }
+}
+
+.pagePreloader{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width:  100vw;
+  height:  100vh;
+}
+
+*:disabled{
+  cursor: not-allowed;
+}

@@ -1,0 +1,110 @@
+@import "utils/theme.scss";
+
+#login_page{
+  height: 100vh;
+  min-height:  95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(0deg, $primary-dim, $primary);
+
+  .login_form{
+    width: 100%;
+    max-width: 360px;
+    display: block;
+
+    .avatar__icon{
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+      position: relative;
+
+      &:before, &:after{
+        content: '';
+        background: #fff;
+        height: 2px;
+        right: calc(50% + 62px);
+        top: 50%;
+        left: 0px;
+        position: absolute;
+        display: block;
+      }
+      &:after{
+        right: 0px;
+        left: calc(50% + 62px);
+      }
+
+      .avatar__icon__svg{
+        width: 125px;
+        height: 125px;
+        color: #fff;
+        border: 2px solid #fff;
+        border-radius: 100%;
+        padding: 10px;
+      }
+    }
+
+    label{
+      display: flex;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      align-items: center;
+      margin-bottom: 15px;
+
+      svg{
+        height: 40px;
+        width: 50px;
+        padding: 0px 10px;
+        color: #fff;
+      }
+
+    }
+
+    input{
+      width: 100%;
+      height: 50px;
+      background: #fff;
+      font-size: 18px;
+      border: 0;
+      outline: none;
+      border-radius: 0px 7px 7px 0px;
+      padding: 0px 10px;
+      transition: padding .3s ease;
+
+      &:focus{
+        padding: 0px 15px;
+      }
+
+      &[type="submit"]{
+        background: transparent;
+        color: #fff;
+        border: 2px solid #fff;
+        border-radius: 10px;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        cursor: pointer;
+
+        &[disabled]{
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    .login_form__switch{
+      display: flex;
+      justify-content: space-between;
+      
+      a{
+        text-decoration: none;
+        color: #fff;
+        transition: all .3s ease;
+        
+        &:hover{
+          color: $secondary;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
