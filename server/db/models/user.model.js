@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../connection.js');
+const sequelize = require('../connection.config.js');
 const bcrypt = require("bcrypt")
 
 
@@ -34,21 +34,6 @@ const User = sequelize.define('User', {
 		set(value){
 			this.setDataValue( 'password', bcrypt.hashSync(value, 12) )
 		}
-	},
-	theme: {
-		type: DataTypes.STRING,
-		allowNull: false,
-		defaultValue: 'dark'
-	},
-	codeBlockTheme: {
-		type: DataTypes.STRING,
-		allowNull: false,
-		defaultValue: 'default'
-	},
-	defaultCodingLang: {
-		type: DataTypes.STRING,
-		allowNull: false,
-		defaultValue: 'javascript'
 	},
 	createdAt: {
 		type: DataTypes.DATE,

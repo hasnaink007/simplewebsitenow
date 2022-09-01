@@ -4,12 +4,15 @@ import { EditorContext } from 'contexts/EditorContext';
 import Wrapper from 'pages/Wrapper';
 import UserSettings from 'components/UserSettings/UserSettings';
 
+// import EmailEditor from 'react-email-editor'
+
 import './Dashboard.scss';
 
 
 export default class Editor extends Component {
 	static contextType = UserContext;
 	render(){
+		document.title = "Projects"
 		return <EditorComponent userContext={this.context} />
 	}
 }
@@ -25,7 +28,7 @@ class EditorComponent extends Component {
 	}
 
 	componentDidMount(){
-		// Load editor
+		// Load projects or stuff
 	}
 
 	handleChange = (e) => {
@@ -49,7 +52,10 @@ class EditorComponent extends Component {
 			<Wrapper>
 				<div className="dashboard">
 					{this.state.showSettings && <UserSettings hide={this.hideSttings} userContext={this.props.userContext} />}
-					<div id='pageEditor'></div>
+					
+					<h1>Projects</h1>
+
+					{/* Projects go here */}
 				</div>
 			</Wrapper>
 		)

@@ -1,7 +1,8 @@
 const User = require('./user.model.js')
-const Note = require('./note.model')
+const Project = require('./project.model')
+const Page = require('./page.model')
 const Coupon = require('./coupon.model')
 const ResetPassToken = require('./resetPasswordToken.model')
 
 
-module.exports = { User, Note, Coupon, ResetPassToken }
+module.exports = { User, Project, Page, Coupon, ResetPassToken }

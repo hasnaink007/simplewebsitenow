@@ -1,0 +1,72 @@
+import React, { Component } from 'react';
+import { toast } from 'react-toastify';
+import { toastOptions } from 'src/utils/toast';
+import { getURLParam } from 'utils/util';
+
+const ProjectContext = React.createContext();
+
+class ProjectContextProvider extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			loading: true,
+			saving: false,
+			projects: {},
+			filter: '',
+			
+			loadProjects: this.loadProjects,
+			deleteProject: this.deleteProject,
+			saveProject: this.saveProject,
+			createProject: this.createProject,
+		}
+	}
+
+	componentDidMount(){
+		this.loadProjects()
+	}
+
+	api_error  = () => {
+		if( window.confirm('There were some error loading this page. Please refresh') ){
+			window.location.reload()
+		}
+	}
+
+	loadProjects = async () => {
+		let req = await fetch(`/api/notes`)
+		let res = await req.json()
+		if(res.err){
+			window.history.pushState({}, '', '/')
+			return
+		}
+		let ID = getURLParam('noteID')
+		let selectedNote = res?.find(note => note.id === Number(ID)) || {}
+		let Editor = res.filter(note => !note.deleted)
+		let recyclebin = res.filter(note => note.deleted)
+		this.setState({ ...this.state, Editor, recyclebin, selectedNote, loading: false })
+	}
+
+	deleteProject = async () => {
+		let toastID = toast.loading('Deleting note...')
+		let req = await fetch(`/api/note/${this.state.selectedNote.id}`, {
+			method: 'DELETE',
+		})
+		let res = await req.json()
+		let Editor = this.state.Editor.filter(n => n.id !== this.state.selectedNote.id)
+		let recyclebin = [...this.state.recyclebin, this.state.selectedNote]
+		this.setState({ ...this.state, Editor, recyclebin, selectedNote: {} })
+		window.history.pushState({}, '', `/dashboard/`)
+		toast.update(toastID, {...toastOptions, render: 'Moved to recycle bin', type: 'success' })
+	}
+	
+
+	render() {
+		return (
+			<ProjectContext.Provider value={this.state}>
+				{this.props.children}
+			</ProjectContext.Provider>
+		);
+	}
+}
+
+export { ProjectContext, ProjectContextProvider };

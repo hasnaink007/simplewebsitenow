@@ -6,7 +6,6 @@ const {Op} = require("sequelize")
 // const execQuery = require('../db/execQuery.js')
 
 const User = require('../db/models/user.model')
-const Note = require('../db/models/note.model')
 const Coupon = require('../db/models/coupon.model')
 const userRoutes = express.Router()
 
@@ -51,7 +50,7 @@ userRoutes.route("/api/users/recover").post( async (req, res) => {
 		"From": "support@masterwebapps.com",
 		"To": user.email,
 		"Subject": "Reset Password",
-		"HtmlBody": "<strong>Hello</strong>.</br>Please click the link below to reset your GammaScript password.</br><a href='http://gammascript.com/reset-password?token=" + token.token + "'>Reset Password</a></br>",
+		"HtmlBody": "<strong>Hello</strong>.</br>Please click the link below to reset your password.</br><a href='http://simplewebsitenow.com/reset-password?token=" + token.token + "'>Reset Password</a></br>",
 		"TextBody": "",
 		"MessageStream": "outbound"
 	});
@@ -137,9 +136,6 @@ userRoutes.route("/api/users/register").post(async (req, res) => {
 			password,
 			email,
 			name,
-			codeBlockTheme: 'default',
-			theme: 'dark',
-			defaultCodingLang: 'javascript'
 		}
 		
 		// Check Coupon info to make user VIP
@@ -153,53 +149,9 @@ userRoutes.route("/api/users/register").post(async (req, res) => {
 		// ===============Coupon Implementation code block ends here=================
 
 		let user = await User.create(userInfo)
-		/* user.codeBlockTheme = 'default'
-		user.theme = 'dark'
-		user.defaultCodingLang = 'javascript'
-		await user.save() */
 		let createdUser = user.get()
 		req.session.user = createdUser
 
-		// Create sample Note
-		const fs = require('fs')
-		let templates = [
-			{
-				title: 'Today\'s goals',
-				content: fs.readFileSync('./server/templates/notes/goals.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Awesome App',
-				content: fs.readFileSync('./server/templates/notes/simple.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Simple Chart',
-				content: fs.readFileSync('./server/templates/notes/charts.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Multiple Features',
-				content: fs.readFileSync('./server/templates/notes/multi.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Example of UML Chart',
-				content: fs.readFileSync('./server/templates/notes/uml.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Table with Merged Cell',
-				content: fs.readFileSync('./server/templates/notes/table.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Text color Example',
-				content: fs.readFileSync('./server/templates/notes/color.md', 'utf8'),
-				owner: createdUser.id,
-			},{
-				title: 'Code syntax Highlighting',
-				content: fs.readFileSync('./server/templates/notes/code.md', 'utf8'),
-				owner: createdUser.id,
-			}
-		]
-
-		await Note.bulkCreate(templates)
-		delete createdUser.password
 		res.json({user: createdUser, res: 'success', text: `Welcome ${user.name}!`})
 	}catch(err){
 		console.log(err)
@@ -209,7 +161,7 @@ userRoutes.route("/api/users/register").post(async (req, res) => {
 
 // Update user settings
 userRoutes.route("/api/users/update").post(async(req, res) => {
-	if( req.session.user ){
+	if( req.user && req.user.id ){
 		let  {name, theme, lang, cbTheme} = req.body
 
 		let user = await User.findOne({ where: { id: req.session.user.id } })

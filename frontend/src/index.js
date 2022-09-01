@@ -16,6 +16,7 @@ import AuthenticatedAccess from './AuthenticatedAccess';
 // Pages
 import Login from 'pages/Login/Login';
 import Dashboard from 'pages/Dashboard/Dashboard';
+import Editor from 'pages/Editor/Editor';
 import NotFound from 'pages/NotFound/NotFound';
 import About from './pages/About/About';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
@@ -44,13 +45,13 @@ ReactDOM.render(
 							</AuthenticatedAccess>
 						</EditorContextProvider>
 					} />
-					{/* <Route exact path="/adminLinks" element={
-						<NotesContextProvider>
+					{<Route exact path="/editor" element={
+						<EditorContextProvider>
 							<AuthenticatedAccess>
-								<AdminLinks />
+								<Editor />
 							</AuthenticatedAccess>
-						</NotesContextProvider>
-					} /> */}
+						</EditorContextProvider>
+					} />}
 					<Route path="/reset-password" element={<ResetPassword />} />
 					<Route path="/about" element={<About />} />
 					<Route path="*" element={<NotFound />} />

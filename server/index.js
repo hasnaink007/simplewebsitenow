@@ -3,7 +3,7 @@ require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
 const session = require('express-session')
-const sequelize = require('./db/connection.js')
+const sequelize = require('./db/connection.config')
 const models = require('./db/models')
 
 const app = express()
@@ -11,41 +11,69 @@ const app = express()
 app.use(cors())
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
-app.use(session({
-	name : 'gammaScript',
-	secret : '^$%*GammaScriptSessionSecret*%$^',
-	resave :false,
-	saveUninitialized: true,
-	cookie : {
-		maxAge:(1000 * 60 * 100)
-	}      
-}));
 
 
-app.use("/api/notes*", async (req, res, next) => {
-	if(!req.session.user || !req.session.user.email){
-		res.json({err: 'Not allowed!'})
-		return
+// Define success and error response type helpers
+app.use( async (req, res, next) => {
+	res.error = (text, data) => {
+		res.json({
+			success: false,
+			message: text,
+			data
+		})
+	}
+	res.success = (text, data) => {
+		res.json({
+			success: true,
+			message: text,
+			data
+		})
 	}
 	next()
 })
-app.use("/api/coupons*", async (req, res, next) => {
-	if(!req.session.user || !req.session.user.email){
-		res.json({err: 'Not allowed!'})
-		return
-	}
+
+// Authenticate user
+const AuthenticateRoute = async (req, res, next) => {
+	let decoded;
+    try{
+        decoded = JWT.verify(req.headers.authentication, process.env.JWT_SECRET)
+        if(!decoded || Number.isNaN(Number(decoded.id))){
+            // console.log('==================>>Not decoded')
+            res.json(createErrorObject('Invalid or Missing Token'))
+            return
+        }
+    }catch(e){
+        // console.log(e)
+        res.json(createErrorObject('Invalid or Missing Token'))
+        return
+    }
+    req.user = decoded
 	next()
-})
+}
+
+
+// Implement Authentication on Routes
+app.use("/api/project*", AuthenticateRoute)
+app.use("/api/coupons*", AuthenticateRoute)
+
+
+
 // Routes
 app.use(require("./api/user"))
-app.use(require("./api/notes"))
+app.use(require("./api/projects"))
 app.use(require("./api/coupon"))
+
+
+
 
 // Handle Errors
 app.use(function(err, req, res, next) {
 	console.error(err.stack)
 	res.status(500).json({error: true, msg: 'Something broke!'})
 })
+
+
+
 
 // Use exress server to render the React App as well in production
 if( process.env.NODE_ENV == 'production'){
@@ -61,6 +89,11 @@ let port = 5000
 if(process.env.NODE_ENV == 'production' && process.env.PORT ){
   port = process.env.PORT
 }
+
+
+
+
+
 app.listen(port, async () => {
 	console.log(`Server is running on port: ${port}`)
 	console.log('Testing DB connection...')
