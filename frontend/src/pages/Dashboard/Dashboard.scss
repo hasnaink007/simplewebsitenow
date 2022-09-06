@@ -3,8 +3,79 @@
 .dashboard{
     position: relative;
 
-    .blockbuilder-branding{
-        display: none;
+    .dashboard_header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        button{
+            max-height: 45px;
+        }
+    }
+
+    .dashboard_projects{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-gap: 20px;
+
+        .project_card{
+            width: 100%;
+            // border: 1px solid #ccc;
+            height: 200px;
+            position: relative;
+            border-radius: 7px;
+            background: #727272;
+
+            .project_preview{
+                height: 160px;
+                position: relative;
+
+                img{
+                    height: 100%;
+                    width: 100%;
+                    object-fit: cover;
+                    border-radius: 7px 7px 0px 0px;
+                }
+
+                .project_name{
+                    position: absolute;
+                    bottom: 0px;
+                    padding: 5px 10px;
+                    width: 100%;
+                    background-color: $secondary;
+                }
+            }
+
+            .p_card_footer{
+                display: flex;
+                position: absolute;
+                bottom: 0px;
+                width: 100%;
+                height: 40px;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 10px;
+                background: #666;
+                border-bottom-left-radius: 7px;
+                border-bottom-right-radius: 7px;
+                
+                a{
+                    color: #fff;
+                }
+
+                svg{
+                    width: 20px;
+                    height: 20px;
+                    cursor: pointer;
+                    transition: .3s;
+
+                    &:hover{
+                        fill: $secondary-light;
+                        color: $secondary-light;
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 const express = require("express")
 const bcrypt = require("bcrypt")
+var JWT = require('jsonwebtoken');
 const {Op} = require("sequelize")
 
 // const UserController = require('../controllers/UserController.js')
@@ -10,19 +11,34 @@ const Coupon = require('../db/models/coupon.model')
 const userRoutes = express.Router()
 
 userRoutes.route("/api/users/current").post(async(req, res) => {
-	if( req.session.user ){
-		let  {name, email, username, theme, defaultCodingLang, codeBlockTheme} = req.session.user
-		res.json({ user: {name, email, username, theme, defaultCodingLang, codeBlockTheme } })
+
+	let decoded;
+    try{
+        decoded = JWT.verify(req.headers.authorization, process.env.JWT_SECRET)
+        if(!decoded || Number.isNaN(Number(decoded.id))){
+            // console.log('==================>>Not decoded')
+            res.error('Invalid')
+            return
+        }
+    }catch(e){
+        // console.log(e)
+        res.error('Invalid')
+        return
+    }
+
+	if( decoded ){
+		let  {name, email, username} = decoded
+		res.success('', { user: {name, email, username } })
 	}else{
-		res.json({ loggedIn: false })
+		res.error('', { loggedIn: false })
 	}
 	return
 })
 
 userRoutes.route("/api/users/logout").post( (req, res) => {
-	req.session.destroy(() => {
+	/* req.session.destroy(() => {
 		res.status(200).end()
-	})
+	}) */
 })
 
 // Create token when a user clicks forgot password
@@ -36,8 +52,10 @@ userRoutes.route("/api/users/recover").post( async (req, res) => {
 
 
 	let ResetPassToken = require('../db/models/resetPasswordToken.model')
+
+	// delete old unused tokens by this user
 	await ResetPassToken.destroy({ where: { user: user.id, used: false } })
-	let tokens = await ResetPassToken.findAll({ where : { user: user.id, used: false } })
+	// let tokens = await ResetPassToken.findAll({ where : { user: user.id, used: false } })
 
 	let token = await ResetPassToken.create({
 		user: user.id,
@@ -80,12 +98,14 @@ userRoutes.route("/api/users/reset_password").post( async (req, res) => {
 	await user.save()
 	token.used = true
 	await token.save()
-	req.session.user = await user.get()
+	req.user = await user.get()
 	res.json({ res: "success", text: "Password updated." })
 })
 
+
+// Log the user in
 userRoutes.route("/api/users/login").post( async (req, res) => {
-	if(req.session.user && req.session.user.email){
+	if(req.user && req.user.email){
 		return
 	}
 
@@ -105,20 +125,24 @@ userRoutes.route("/api/users/login").post( async (req, res) => {
 		return
 	}
 	let userData = await user.get()
+
+	let token = JWT.sign(userData, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 })
+
 	if(bcrypt.compareSync(password, userData.password, 12) ){
-		req.session.user = userData
-		let {name, username, email, theme, defaultCodingLang, codeBlockTheme} = userData
-		res.json({user: {name, username, email, theme, defaultCodingLang, codeBlockTheme}, res: 'success', text: `Welcome Back! ${name}`})
+		let {name, username, email} = userData
+		res.success(`Welcome Back! ${name}`, {user: {name, username, email, token}})
 	}else{
-		res.json({ res: 'error', text: `Incorrect Username or Password.` })
+		res.error(`Incorrect Username or Password.`)
 	}
 })
 
+
+// Register new user
 userRoutes.route("/api/users/register").post(async (req, res) => {
 	try{
 		let { password, email, name } = req.body
-		if(req.session && req.session.user && req.session.user.id){
-			res.json({})
+		if(req.user && req.user.id){
+			res.error('',{})
 			return
 		}
 		username = req.body.username.toLowerCase().replace(/([^a-zA-Z0-9\s])/g, '').replace(/\s/g, '_')
@@ -128,7 +152,7 @@ userRoutes.route("/api/users/register").post(async (req, res) => {
 			userCheck = await User.findOne({ where: { [Op.or]: [{ email: username.toLowerCase() },{ email: email.toLowerCase() } ]} })
 		}
 		if(userCheck && userCheck.id){
-			res.json({res: 'error', text: 'Email or Username already exists.'})
+			res.error('Email or Username already exists.')
 			return
 		}
 		let userInfo = {
@@ -150,47 +174,34 @@ userRoutes.route("/api/users/register").post(async (req, res) => {
 
 		let user = await User.create(userInfo)
 		let createdUser = user.get()
-		req.session.user = createdUser
+		// req.session.user = createdUser
+		let token = JWT.sign(createdUser, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 })
 
-		res.json({user: createdUser, res: 'success', text: `Welcome ${user.name}!`})
+		res.success(`Welcome ${user.name}!`, {user: {name, username, email, token}})
 	}catch(err){
 		console.log(err)
-		res.json({res: 'error', text: 'Something went wrong.'})
+		res.error('Something went wrong.')
 	}
 })
 
 // Update user settings
 userRoutes.route("/api/users/update").post(async(req, res) => {
 	if( req.user && req.user.id ){
-		let  {name, theme, lang, cbTheme} = req.body
 
-		let user = await User.findOne({ where: { id: req.session.user.id } })
+		let  {name} = req.body
+
+		let user = await User.findOne({ where: { id: req.user.id } })
 		if(user){
 			// Allow Maximum 25 chars in name
 			user.name = name ? name.slice(0,25) : user.name
-			req.session.user.name = user.name
-			
-			// check if theme name is valid
-			let themes = ["dark","light","coffee","violet","squid","aliceblue","charcoal"]
-			user.theme = (theme && themes.includes(theme)) ? theme : user.theme
-			req.session.user.theme = user.theme
-
-			// check if language selected is valid
-			let langs = ["plaintext","markup","html","mathml","svg","xml","ssml","atom","rss","css","clike","javascript","js","abap","abnf","actionscript","ada","agda","al","antlr4","g4","apacheconf","apex","apl","applescript","aql","arff","asciidoc","adoc","asm6502","aspnet","autohotkey","autoit","bash","shell","basic","batch","bbcode","shortcode","birb","bnf","rbnf","brainfuck","brightscript","bro","bsl","oscript","c","bison","cil","clojure","cmake","coffeescript","coffee","concurnas","conc","cpp","arduino","ino","csharp","cs","dotnet","csp","cypher","d","dart","dataweave","dax","dhall","diff","markup-templating","django","jinja2","dns-zone-file","dns-zone","docker","dockerfile","ebnf","editorconfig","eiffel","ejs","eta","elixir","elm","erb","erlang","etlua","excel-formula","xls","xlsx","factor","firestore-security-rules","flow","fortran","fsharp","ftl","gcode","gdscript","gedcom","gherkin","git","glsl","gml","gamemakerlanguage","go","graphql","groovy","haml","handlebars","hbs","mustache","haskell","hs","haxe","hcl","hlsl","hpkp","hsts","http","ichigojam","icon","iecst","ignore","gitignore","hgignore","npmignore","inform7","ini","io","j","java","javadoclike","javadoc","typescript","ts","javastacktrace","jolie","jq","jsdoc","json","webmanifest","json5","jsonp","jsstacktrace","jsx","julia","keyman","kotlin","kt","kts","latex","tex","context","latte","less","lilypond","ly","liquid","lisp","elisp","emacs","emacs-lisp","livescript","llvm","lolcode","lua","makefile","markdown","md","matlab","mel","mizar","mongodb","monkey","moonscript","moon","n1ql","n4js","n4jsd","nand2tetris-hdl","naniscript","nani","nasm","neon","nginx","nim","nix","nsis","objectivec","objc","ocaml","opencl","oz","parigp","parser","pascal","objectpascal","pascaligo","pcaxis","px","peoplecode","pcode","perl","php","phpdoc","sql","plsql","powerquery","pq","mscript","powershell","processing","prolog","promql","properties","protobuf","pug","puppet","pure","purebasic","pbfasm","purescript","purs","python","py","q","qml","qore","r","scheme","racket","rkt","reason","regex","renpy","rpy","rest","rip","roboconf","robotframework","robot","ruby","rb","crystal","rust","sas","sass","scala","scss","shell-session","shellsession","sh-session","smali","smalltalk","smarty","sml","smlnj","solidity","sol","solution-file","sln","soy","turtle","trig","sparql","rq","splunk-spl","sqf","stan","stylus","swift","t4-templating","t4-cs","t4","t4-vb","tap","tcl","textile","toml","tsx","tt2","twig","typoscript","tsconfig","unrealscript","uscript","uc","vala","vbnet","velocity","verilog","vhdl","vim","visual-basic","vb","vba","warpscript","wasm","wiki","xeora","xeoracube","xojo","xquery","yaml","yml","yang","zig"]
-			user.defaultCodingLang = (lang && langs.includes(lang) ) ? lang : user.defaultCodingLang
-			req.session.user.defaultCodingLang = user.defaultCodingLang
-
-			let cbThemes = ["default","dark","coy","funky","okaidia","twilight","tomorrow","solarizedlight"]
-			user.codeBlockTheme = (cbTheme && cbThemes.includes(cbTheme) ) ? cbTheme : user.codeBlockTheme
-			req.session.user.codeBlockTheme = user.codeBlockTheme
 
 			await user.save()
-			res.json({ user: {name: user.name, theme: user.theme, lang: user.defaultCodingLang, codeBlockTheme: user.codeBlockTheme }, res: 'success', text: 'Settings Updated!' })
+			res.success('Settings Updated!', { user: {name}})
 		}else{
-			res.json({ res: 'error', text: 'Not Found. Please refresh the page and try again.' })
+			res.error('Not Found. Please refresh the page and try again.')
 		}
 	}else{
-		res.json({ res: 'error', text: 'You are not logged in.' })
+		res.error('You are not logged in.')
 	}
 	return
 })

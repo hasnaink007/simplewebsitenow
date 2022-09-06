@@ -2,7 +2,8 @@ require("dotenv").config()
 
 const express = require("express")
 const cors = require("cors")
-const session = require('express-session')
+const JWT = require('jsonwebtoken');
+
 const sequelize = require('./db/connection.config')
 const models = require('./db/models')
 
@@ -36,15 +37,15 @@ app.use( async (req, res, next) => {
 const AuthenticateRoute = async (req, res, next) => {
 	let decoded;
     try{
-        decoded = JWT.verify(req.headers.authentication, process.env.JWT_SECRET)
+        decoded = JWT.verify(req.headers.authorization, process.env.JWT_SECRET)
         if(!decoded || Number.isNaN(Number(decoded.id))){
             // console.log('==================>>Not decoded')
-            res.json(createErrorObject('Invalid or Missing Token'))
+            res.error('Unauthorized.')
             return
         }
     }catch(e){
-        // console.log(e)
-        res.json(createErrorObject('Invalid or Missing Token'))
+        console.log(e)
+        res.error('Unauthorized')
         return
     }
     req.user = decoded
@@ -54,13 +55,15 @@ const AuthenticateRoute = async (req, res, next) => {
 
 // Implement Authentication on Routes
 app.use("/api/project*", AuthenticateRoute)
+app.use("/api/page*", AuthenticateRoute)
+// app.use("/api/page*", AuthenticateRoute)
 app.use("/api/coupons*", AuthenticateRoute)
-
 
 
 // Routes
 app.use(require("./api/user"))
 app.use(require("./api/projects"))
+app.use(require("./api/pages"))
 app.use(require("./api/coupon"))
 
 

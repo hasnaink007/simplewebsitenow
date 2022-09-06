@@ -47,12 +47,14 @@
 			position: absolute;
 			top: 0px;
 			right: 0px;
+			width: fit-content;
 
 			svg{
 				height: 20px;
 				width: 20px;
 				border-radius: 100%;
-				background: #fff;
+				background: transparent;
+				fill: red;
 			}
 		}
 
@@ -60,13 +62,13 @@
 			overflow: auto;
 			height: 100%;
 
-			.userinfo_form{
+			.pageinfo_form{
 				display: grid;
-				grid-template-columns: 1fr 1fr;
+				// grid-template-columns: 1fr 1fr;
 				grid-gap: 15px;
 				align-items: end;
 
-				input, label, select{
+				input, label, select, textarea{
 					width: 100%;
 					color: #333;
 
@@ -75,7 +77,7 @@
 					}
 				}
 
-				input, select{
+				input, select, textarea{
 					font-size: 15px;
 					border: 1px solid #ccc;
 					padding: 15px;
@@ -86,9 +88,12 @@
 					background: #fff;
 					padding: 0 15px;
 				}
+				textarea{
+					height: 100px;
+				}
 
 				button{
-					background: #ffb500;
+					background: $secondary-light;
 					border-radius: 7px;
 					border: 0px solid transparent;
 					padding: 15px;
@@ -101,7 +106,7 @@
 					cursor: pointer;
 
 					&:hover{
-						background: #ffb700e3;
+						background: $secondary;
 					}
 				}
 			}

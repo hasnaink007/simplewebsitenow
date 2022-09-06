@@ -7,3 +7,7 @@ export const getURLParam = (name) => {
     // return params[name]
     return new URL(window.location.href).searchParams.get(name)
 }
+
+export const getAuth = () => {
+    return {Authorization: window.localStorage.simpleWebsiteToken}
+}

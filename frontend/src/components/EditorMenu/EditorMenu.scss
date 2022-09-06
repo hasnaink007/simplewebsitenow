@@ -1,0 +1,76 @@
+@import "utils/theme.scss";
+
+#hks_custom_menu{
+	position: absolute;
+    z-index: 5;
+    right: calc(15% + 280px);
+	width: 250px;
+    padding: 5px;
+	color: #fff;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	user-select: none;
+
+	.hks_save_btn{
+		margin-left: 5px;
+		margin-right: 0px;
+		font-size: 18px;
+	}
+
+	.selected_page{
+		width: 100%;
+		border: 1px solid #999;
+		padding: 5px;
+		border-radius: 5px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		cursor: pointer;
+	}
+
+	.all_pages{
+		position: absolute;
+		top: 35px;
+		background: #999;
+		width: 100%;
+		max-width: 210px;
+
+		.page_entry{
+			cursor: pointer;
+			display: block;
+			padding: 7px 10px;
+			transition: .3s;
+			border-bottom: 1px solid #888;
+			line-break: anywhere;
+			position: relative;
+
+			&.selected_page:before{
+				content: '';
+				position: absolute;
+				display: block;
+				width: 5px;
+				height: 5px;
+				background: $secondary-light;
+				border-radius: 100px;
+				top: 14px;
+				left: 3px;
+			}
+
+			.edit_page{
+				position: absolute;
+				top: 10px;
+				right: 8px;
+
+				svg:hover{
+					color: $secondary-light;
+				}
+			}
+
+			&:hover{
+				background: #888; 
+			}
+		}
+		
+	}
+}

@@ -47,7 +47,7 @@ class Login extends Component {
 				let { username, password } = this.state
 				toastID = toast.loading('Logging you in... Please wait.')
 				let r = await this.context.logUserIn(username, password)
-				toast.update(toastID, {...toastOptions, type: r.res, render: r.text})
+				toast.update(toastID, {...toastOptions, type: r.success ? 'success':'error', render: r.message})
 			
 			}else if(this.state.type === 'signup'){
 			
@@ -59,13 +59,13 @@ class Login extends Component {
 				}
 				toastID = toast.loading('Registering account... Please wait.')
 				let r = await this.context.registerUser(this.state)
-				toast.update(toastID, {...toastOptions, type: r.res, render: r.text})
+				toast.update(toastID, {...toastOptions, type: r.success?'success':'error', render: r.message})
 				this.context.refreshUser()
 			}else{
 				toastID = toast.loading('Sending Reset Link... Please wait.')
 				this.setState({...this.state, loading: true})
 				let r = await this.context.recover({email: this.state.email})
-				toast.update(toastID, {...toastOptions, type: r.res, render: r.text})
+				toast.update(toastID, {...toastOptions, type: r.success?'success':'error', render: r.message})
 			}
 			this.setState({...this.state, loading: false})
 		}catch(e){

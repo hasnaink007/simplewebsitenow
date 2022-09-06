@@ -30,13 +30,7 @@ const Project = sequelize.define('Project', {
 		type: DataTypes.BOOLEAN,
 		defaultValue: true,
 		allowNull: true,
-	},
-	/* createdAt: {
-		type: DataTypes.DATE,
-		defaultValue : DataTypes.NOW
 	}
-}, {
-	// Other model options go here */
 });
 
 module.exports = Project;

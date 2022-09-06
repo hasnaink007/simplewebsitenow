@@ -8,13 +8,19 @@ const Page = sequelize.define('Page', {
 		allowNull: false,
         defaultValue: 'New Page'
 	},
+	title: {
+		type: DataTypes.STRING,
+		allowNull: true,
+        defaultValue: 'New Page'
+	},
     description: {
         type: DataTypes.STRING,
         allowNull: true
     },
-    isTemplate: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
+    type: {
+		// index, template or other error pages
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     headerScripts: {
         type: DataTypes.STRING,

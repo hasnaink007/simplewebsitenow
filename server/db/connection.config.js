@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 const config =  {
   host: process.env.DB_HOST || '127.0.0.1',
   port: process.env.DB_PORT || '3306',
-  database: process.env.DB_NAME || 'test',
+  database: process.env.DB_NAME || 'the_simple_website',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
 };

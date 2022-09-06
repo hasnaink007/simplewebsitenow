@@ -9,6 +9,7 @@ import './index.scss';
 // Contexts
 import { UserContextProvider } from 'contexts/UserContext';
 import { EditorContextProvider } from 'contexts/EditorContext';
+import { ProjectContextProvider } from 'contexts/ProjectContext';
 
 // Authentication
 import AuthenticatedAccess from './AuthenticatedAccess';
@@ -39,18 +40,18 @@ ReactDOM.render(
 				<Routes>
 					<Route exact path="/" element={<Login />} />
 					<Route exact path="/dashboard" element={
-						<EditorContextProvider>
-							<AuthenticatedAccess>
+						<AuthenticatedAccess>
+							<ProjectContextProvider>
 								<Dashboard />
-							</AuthenticatedAccess>
-						</EditorContextProvider>
+							</ProjectContextProvider>
+						</AuthenticatedAccess>
 					} />
-					{<Route exact path="/editor" element={
-						<EditorContextProvider>
-							<AuthenticatedAccess>
+					{<Route exact path="/editor/:id" element={
+						<AuthenticatedAccess>
+							<EditorContextProvider>
 								<Editor />
-							</AuthenticatedAccess>
-						</EditorContextProvider>
+							</EditorContextProvider>
+						</AuthenticatedAccess>
 					} />}
 					<Route path="/reset-password" element={<ResetPassword />} />
 					<Route path="/about" element={<About />} />

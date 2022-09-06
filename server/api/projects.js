@@ -1,18 +1,32 @@
 const express = require("express");
 const Project = require("../db/models/project.model");
 const { Op } = require("sequelize");
+const Page = require("../db/models/page.model");
 
 const projectsRoutes = express.Router();
 
 // Get all user projects
 projectsRoutes.route("/api/projects").get( async (req, res) => {
-	if(!req.user || !req.user.email || !req.session.user.id){
-		res.json([{}])
+	if(!req.user || !req.user.email || !req.user.id){
+		res.error('', [{}])
 		return
 	}
 	let ownerID = req.user.id
-	let projects = await Project.findAll({where: {ownerID /* , deleted: {[Op.ne] : true} */ }, order: [['createdAt', 'DESC']]})
-	res.json(projects)
+	let projects = await Project.findAll({
+		where: {ownerID },
+		order: [['createdAt', 'ASC']],
+		attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
+	})
+	for( let i = 0; i < projects.length; i++ ){
+		let pages = await Page.findAll({
+			where : {projectID: projects[i].id},
+			attributes: ['name', 'id', 'projectID', 'type']
+		})
+		projects[i] = {...projects[i].dataValues, pages: (pages || []) }
+		console.log(pages)
+	}
+
+	res.success('', projects)
 })
 
 // Add/Update user project
@@ -20,29 +34,56 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 
 	try{
 		let record;
-		if(req.body.id){
-			let project = await Project.findOne({where: {id: req.body.id} })
-			if(project && project.owner && req.user && req.user.id && Number(project.owner) == Number(req.user.id)){
-				project.title = req.body.title
-				project.content = req.body.content
+		if(req.body.pid){
+			let project = await Project.findOne({where: {id: req.body.pid} })
+			
+			if(project && project.ownerID && req.user && req.user.id && Number(project.ownerID) == Number(req.user.id)){
+				project.name = req.body.name
+				project.description = req.body.description
+				project.domainName = req.body.domainName
+				project.isSubDomain = true
+
 				record = await project.save()
+
+				// Update index page
+				let newIndex = await Page.findOne({where: { projectID: project.id, id: req.body.indexPage }})
+				let oldIndex = await Page.findOne({where: { projectID: project.id, type: 'index' }})
+				if(newIndex){
+					if(oldIndex){
+						oldIndex.type = 'page',
+						await oldIndex.save()
+					}
+					newIndex.type = 'index'
+					await newIndex.save()
+					console.log({oldIndex, newIndex})
+				}
 			}else{
-				res.json({res: 'error', text: 'Error updating project', project: req.body})
+				res.error('Error updating project')
 				return
 			}
 		}else{
 			let project = await Project.create({
-				title: req.body.title,
-				content: req.body.content,
-				owner: req.user.id,
+				name: req.body.name,
+				description: req.body.description,
+				ownerID: req.user.id,
+				isSubDomain: true,
 			})
 			record = await project.save()
+			let page = await Page.create({
+				name: 'index',
+				type: 'index',
+				description: 'Default index page when project was created',
+				creatorID: req.user.id,
+				projectID: record.id,
+				content: '{}'
+			})
+			await page.save()
 		}
 
-		res.json({res: 'success', text: req.body.id ? 'Project Updated': 'Project Created', project: record})
+		res.success('Settings Updated', record)
 	}catch(e){
 		console.log(e)
-		res.json({res: 'error', text: 'Error saving project', project: req.body})
+		res.error('Error saving project')
 	}
 })
 

@@ -1,16 +1,15 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { MdEditNote } from 'react-icons/md';
 
 import logo from 'assets/logo.png';
 
-import { EditorContext } from 'contexts/EditorContext';
+import { ProjectContext } from 'contexts/ProjectContext';
 import './SideBar.scss';
 
 
 class SideBar extends Component {
 	
-	static contextType = EditorContext;
+	static contextType = ProjectContext;
 
 	constructor(props){
 		super(props)
@@ -41,10 +40,10 @@ class SideBar extends Component {
 
 
 
-							<Link to={`/dashboard`} >Projects</Link>
-							<Link to={`/dashboard`} >About Us</Link>
+							<Link to={`/dashboard`} className={window.location.pathname.split('/')[1]=='dashboard'?'active':'' }>Projects</Link>
+							<Link to={`/dashboard`} >Payments</Link>
 							<Link to={`/dashboard`} >Settings</Link>
-							<Link to={`/dashboard`} >Logout</Link>
+							<Link to={`/dashboard`} onClick={this.props.userContext.logUserOut}> Logout</Link>
 
 
 

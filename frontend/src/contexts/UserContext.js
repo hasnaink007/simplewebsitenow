@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import { toastOptions } from 'utils/toast';
+import { getAuth } from 'utils/util';
 
 const UserContext = React.createContext()
 
@@ -26,12 +27,16 @@ class UserContextProvider extends Component {
 
 	refreshUser = ()=>{
 		fetch(`/api/users/current`, {
-			method: 'POST'
+			method: 'POST',
+			headers: {
+				...getAuth()
+			}
 		})
 		.then(res => res.json())
 		.then(data =>{
-			let isLoggedIn = data.user ? true : false
-			let user = data.user ? data.user : {}
+
+			let isLoggedIn = data.success
+			let user =  data?.data?.user || {}
 			this.setState({ isLoggedIn, user })
 		})
 		.catch(err =>{
@@ -52,7 +57,8 @@ class UserContextProvider extends Component {
 			let req = await fetch(`/api/users/update`, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					...getAuth()
 				},
 				body: JSON.stringify(data)
 			})
@@ -82,8 +88,9 @@ class UserContextProvider extends Component {
 			})
 
 			const login = await res.json()
-			if(login.res == 'success'){
-				this.setState({ isLoggedIn: true, user: login.user })
+			if(login.success){
+				window.localStorage.setItem('simpleWebsiteToken', login.data.user.token )
+				this.setState({ isLoggedIn: true, user: login.data.user })
 			}
 			return login
 
@@ -106,6 +113,9 @@ class UserContextProvider extends Component {
 			})
 
 			let responseStatus = await res.json()
+			if(responseStatus.success){
+				window.localStorage.setItem('simpleWebsiteToken', responseStatus.data.user.token)
+			}
 			return responseStatus
 			if(responseStatus.user?.name){
 				this.setState({...this.state, isLoggedIn: true, user: responseStatus.user })
@@ -118,11 +128,7 @@ class UserContextProvider extends Component {
 	}
 
 	logUserOut = async () => {
-		await fetch(`/api/users/logout`, {
-			credentials: 'include',
-			method: 'POST',
-		})
-
+		delete window.localStorage.simpleWebsiteToken
 		this.setState({ isLoggedIn: false, user: {} })
 	}
 

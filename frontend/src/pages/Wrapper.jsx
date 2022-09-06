@@ -8,7 +8,7 @@ export default class Wrapper extends Component {
 	render(){
 		return(
 			<>
-				<div className={`main_wrapper_container ${this.props.className} user-theme-${this.context.user.theme}  cb-theme-${this.context.user.codeBlockTheme}`}>
+				<div className={`main_wrapper_container ${this.props.className}`}>
 					<SideBar userContext={this.context} />
 					<div className="right_content">
 						{/* <NavBar userContext={this.context} /> */}

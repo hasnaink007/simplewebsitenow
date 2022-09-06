@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import { toastOptions } from 'src/utils/toast';
-import { getURLParam } from 'utils/util';
+import { getAuth } from 'utils/util';
 
 const ProjectContext = React.createContext();
 
@@ -12,10 +12,11 @@ class ProjectContextProvider extends Component {
 		this.state = {
 			loading: true,
 			saving: false,
-			projects: {},
+			projects: [],
 			filter: '',
 			
 			loadProjects: this.loadProjects,
+			updateSettings: this.updateSettings,
 			deleteProject: this.deleteProject,
 			saveProject: this.saveProject,
 			createProject: this.createProject,
@@ -33,17 +34,43 @@ class ProjectContextProvider extends Component {
 	}
 
 	loadProjects = async () => {
-		let req = await fetch(`/api/notes`)
+		let req = await fetch(`/api/projects`, {headers: getAuth()})
 		let res = await req.json()
-		if(res.err){
-			window.history.pushState({}, '', '/')
+		if(!res.success){
+			toast.error('Error loading projects data')
 			return
 		}
-		let ID = getURLParam('noteID')
-		let selectedNote = res?.find(note => note.id === Number(ID)) || {}
-		let Editor = res.filter(note => !note.deleted)
-		let recyclebin = res.filter(note => note.deleted)
-		this.setState({ ...this.state, Editor, recyclebin, selectedNote, loading: false })
+		let projects = res.data.map(p => {
+			return p;
+		})
+		this.setState({ ...this.state, projects, loading: false })
+	}
+
+	updateSettings = async (pid, data) => {
+
+		this.setState({ ...this.state, loading: true })
+		let req = await fetch(`/api/project/save`, {
+			headers: {
+				'content-type': 'application/json',
+				...getAuth()
+			},
+			method: 'POST',
+			body: JSON.stringify({ pid, ...data })
+		})
+		let res = await req.json()
+		if(!res.success){
+			toast.error('Error loading pages data')
+			return
+		}
+		toast.success(res.message)
+		console.log(res)
+		// let projects = this.state.projects.map(p => {
+		// 	if(p.id == pid){
+		// 		p.pages = res.data.pages
+		// 	}
+		// 	return p
+		// })
+		
 	}
 
 	deleteProject = async () => {
