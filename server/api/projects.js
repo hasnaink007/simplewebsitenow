@@ -23,7 +23,6 @@ projectsRoutes.route("/api/projects").get( async (req, res) => {
 			attributes: ['name', 'id', 'projectID', 'type']
 		})
 		projects[i] = {...projects[i].dataValues, pages: (pages || []) }
-		console.log(pages)
 	}
 
 	res.success('', projects)
@@ -55,7 +54,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 					}
 					newIndex.type = 'index'
 					await newIndex.save()
-					console.log({oldIndex, newIndex})
+					// console.log({oldIndex, newIndex})
 				}
 			}else{
 				res.error('Error updating project')

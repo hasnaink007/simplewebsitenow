@@ -1,20 +1,16 @@
 module.exports = {
   apps : [{
-    name   : "GammaScript",
+    name   : "SimpleWebsiteNow",
     script : "./server/index.js",
-    env: {
-      "NODE_ENV"    : "production",
-      "PORT"        : "80",
-      "DB_HOST"     : "localhost", //"178.62.44.32", //"85.10.205.173",
-      // "DB_HOST"     : "85.10.205.173",
-      "DB_NAME"     : "gammascript", //"timeli",
-      // "DB_NAME"     : "timeli",
-      "DB_PASSWORD" : "MammotH.1234z", //"db4free@999",
-      // "DB_PASSWORD" : "db4free@999",
-      "DB_PORT"     : "3306",
-      "DB_USER"     : "GammaScript", //"timeli",
-      // "DB_USER"     : "timeli",
-      "SESSION_KEY" : "!@#$%^&*()",
-    }
+	env: {
+		DB_NAME: 'simple_site_builder',
+		SERVER_PORT: 3500,
+		JWT_SECRET: '!@#%^&*()qwertyuiop',
+		DB_USER: 'simple_site_builder',
+		DB_PASSWORD: 'Mammoth.1234',
+		NODE_ENVIRONMENT: 'production',
+		S3ID: 'DO00REGH3AEMTDAK96AP',
+		S3KEY: 'RpQMGhMBKMwpIfiujf97alnTBS/nIo4+zQOEtql879o'
+	}
   }]
 }

@@ -79,23 +79,15 @@ app.use(function(err, req, res, next) {
 
 
 // Use exress server to render the React App as well in production
-if( process.env.NODE_ENV == 'production'){
+/* if( process.env.NODE_ENV == 'production'){
 	const path = require('path')
 	app.use(express.static(path.join(__dirname, '../build')));
   
 	app.get('/*[^(/api)]', (req, res) => {
 	  res.sendFile(path.join(__dirname, '../build', 'index.html'));
 	});
-}
-
-let port = 5000
-if(process.env.NODE_ENV == 'production' && process.env.PORT ){
-  port = process.env.PORT
-}
-
-
-
-
+} */
+const port = process.env.SERVER_PORT || 3500;
 
 app.listen(port, async () => {
 	console.log(`Server is running on port: ${port}`)

@@ -34,7 +34,6 @@ pagesRoutes.route("/api/page/save").post( async (req, res) => {
 	try{
 		let record;
 		if(req.body.pid){
-			console.log(req.body)
 			let page = await Page.findOne({where: {id: req.body.pid} })
 
 			// Check if the page exists.
