@@ -43,7 +43,7 @@ const createProjectRootDir = (project) => {
 		listen 80;
 		listen [::]:80;
  
-		server_name ${project.domainName};
+		server_name ${project.domainName}.simplewebsitenow.com www.${project.domainName}.simplewebsitenow.com;
  
 		root ${dir};
 		index index.html;
