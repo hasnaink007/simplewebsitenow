@@ -60,26 +60,7 @@ const uploadToBucket = multer({
 
 
 
-router.post('/upload'/* , uploadToBucket.single('image') */, async (req, res) => {
-  console.log(req);
-  // handle Authentication manually
-  let decoded;
-  try{
-    const JWT = require('jsonwebtoken')
-    console.log(req.headers)
-    decoded = JWT.verify(req.headers.authorization, process.env.JWT_SECRET)
-    if(!decoded || Number.isNaN(Number(decoded.id))){
-      res.error('Invalid or Missing Token')
-      return
-    }
-  }catch(e){
-    console.log(e)
-    res.error('Invalid or Missing Token')
-    return
-  }
-  req.user = decoded
-
-
+router.post('/api/image/upload'/* , uploadToBucket.single('image') */, async (req, res) => {
 
   uploadToBucket(req, res, err => {
   
@@ -88,7 +69,7 @@ router.post('/upload'/* , uploadToBucket.single('image') */, async (req, res) =>
       return res.status(400).json({ errors: err });
     }
 
-    return res.status(200).json({ message: 'File uploaded successfully.', fileURL: req.file.location });
+    return res.success('Uploaded!', [{src: req.file.location, type: 'image'}]);
   });
 
   // console.log({files: req.files, file: req.file })

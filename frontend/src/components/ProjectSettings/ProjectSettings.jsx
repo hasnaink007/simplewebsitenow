@@ -22,8 +22,7 @@ export default class ProjectSettings extends Component {
 	}
 	render() {
 
-		let index = this.props.project.pages.find(p => {console.log(p.type);return p.type=='index'})
-		console.log(index)
+		let index = this.props.project.pages.find(p => {return p.type=='index'})
 
 		return (
 			<div id="settings-popup-container-main">

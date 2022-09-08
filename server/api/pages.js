@@ -1,7 +1,11 @@
 const express = require("express");
 const Page = require("../db/models/page.model");
 const Project = require("../db/models/project.model");
+const Assets = require("../db/models/assets.model");
 const { Op } = require("sequelize");
+
+const fs = require('fs');
+const path = require('path');
 
 const pagesRoutes = express.Router();
 
@@ -19,18 +23,23 @@ pagesRoutes.route("/api/pages/:id").get( async (req, res) => {
 	let pages = await Page.findAll({
 		where: { projectID: req.params.id},
 		order: [['createdAt', 'ASC']],
-		attributes: ['id', 'name', 'title', 'description', 'type', 'headerScripts', 'projectID']})
+		attributes: ['id', 'name', 'title', 'description', 'type', 'headerScripts', 'projectID']
+	})
+
+	let assets = await Assets.findAll({where: {projectID: project.id}})
 
 	let selected = await Page.findOne({where: { projectID: req.params.id, type: 'index' }})
-	res.success('', {pages, selected})
+	if(!selected){
+		selected = await Page.findOne({where: { projectID: req.params.id }})
+	}
+	res.success('', {pages, selected, assets})
 })
 
 // Create or save page
 pagesRoutes.route("/api/page/save").post( async (req, res) => {
 
 	let data = req.body;
-	// delete page.content;
-	// console.log(page)
+
 	try{
 		let record;
 		if(req.body.pid){
@@ -49,12 +58,24 @@ pagesRoutes.route("/api/page/save").post( async (req, res) => {
 					return
 				}
 
+				let pageFileName = page.name +'.html'
+				
 				page.title = req.body.title //.replace(/[^a-zA-Z0-9 _\-\!\#\$\%\^\&\*]/ig, '').slice(0, 100) || page.title;
 				page.name = req.body.name.replace(/\s/ig, '_').replace(/[^a-zA-Z0-9_]/ig, '').slice(0, 50) || page.name
 				page.headerScripts = req.body.headerScripts
 				page.description = req.body.description
 				await page.save()
 				page = await page.get()
+
+				// rename html file
+				let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
+				fs.rename( dir +'/'+ pageFileName, dir +'/'+ page.name +'.html', function (err) {
+					if (err) {
+						console.log(err)
+						return
+					};
+				} )
+
 				res.success('Page updated', {...page})
 			}
 		}else{
@@ -86,9 +107,8 @@ pagesRoutes.route("/api/page/save").post( async (req, res) => {
 pagesRoutes.route("/api/page/update").post( async (req, res) => {
 
 	try{
-		let record;
-		if(req.body.id){
-			let page = await Page.findOne({where: {id: req.body.id} })
+		if(req.body.page.id){
+			let page = await Page.findOne({where: {id: req.body.page.id} })
 
 			// Check if the page exists.
 			if(!page){
@@ -103,11 +123,42 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 					return
 				}
 				
-				page.content = req.body.content;
+				page.content = req.body.page.content;
 				// page.name = req.body.name.replace(/\s/ig, '_').replace(/[^a-zA-Z0-9_]/ig, '').slice(0, 20) || page.name
 				await page.save()
 				page = await page.get()
-				res.success('Page updated', page)
+				
+				let assets = req.body.newAssets.map(asset => {
+					return ({
+						src: asset.src,
+						projectID: page.projectID
+					})
+				})
+				assets = await Assets.bulkCreate(assets, { individualHooks: true })
+				if( req.body.deleteAssetsIDs?.length > 0 ){
+					await Assets.destroy({where : { id: req.body.deleteAssetsIDs, projectID: page.projectID}})
+				}
+
+				// update the html file content
+				let content = `<!DOCTYPE html>
+				<html>
+					<head>
+						${page.headerScripts}
+						<style>${req.body.page.css}</style>
+					</head>
+					${req.body.page.html}
+					<script>${req.body.page.js}</script>
+				</html>
+				`
+				let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
+				fs.writeFile( dir +'/'+ page.name +'.html' , content, function (err) {
+					if (err) {
+						console.log(err)
+						return
+					};
+				});
+
+				res.success('Page updated', {page, assets})
 			}
 		}else{
 			res.error('Not Found', req.body)

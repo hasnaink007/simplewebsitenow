@@ -63,7 +63,6 @@ class ProjectContextProvider extends Component {
 			return
 		}
 		toast.success(res.message)
-		console.log(res)
 		// let projects = this.state.projects.map(p => {
 		// 	if(p.id == pid){
 		// 		p.pages = res.data.pages

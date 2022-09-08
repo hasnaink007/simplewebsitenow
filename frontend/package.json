@@ -31,6 +31,7 @@
     "grapesjs-blocks-flexbox": "^0.1.1",
     "grapesjs-custom-code": "^1.0.1",
     "grapesjs-lory-slider": "^0.1.5",
+    "grapesjs-plugin-ckeditor": "^0.0.10",
     "grapesjs-preset-webpage": "^0.1.11",
     "grapesjs-react": "^4.0.1",
     "grapesjs-style-bg": "^1.0.5",

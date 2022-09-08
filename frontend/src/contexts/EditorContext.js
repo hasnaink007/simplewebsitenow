@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { toastOptions } from 'src/utils/toast';
 import { getAuth } from 'utils/util';
 
-
 import grapesjs from 'grapesjs';
 import gsWebpage from 'grapesjs-preset-webpage';
 import gsCustom from 'grapesjs-custom-code';
@@ -12,7 +11,23 @@ import gsTab from 'grapesjs-tabs';
 import 'grapesjs/dist/css/grapes.min.css';
 import 'utils/tooltip.scss';
 
+//other plugins
+import gsTUI from 'grapesjs-tui-image-editor';
+import gsGradient from 'grapesjs-style-gradient';
+import gsFilter from 'grapesjs-style-filter';
+import gsBackground from 'grapesjs-style-bg';
+import gsFlexbox from 'grapesjs-blocks-flexbox';
+import gsSlider from 'grapesjs-lory-slider';
+import gsTooltip from 'grapesjs-tooltip';
+
 const EditorContext = React.createContext();
+
+
+const menuBtns = [
+	['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'],
+	['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'],
+	['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']
+];
 
 class EditorContextProvider extends Component {
 	constructor(props) {
@@ -24,7 +39,8 @@ class EditorContextProvider extends Component {
 			saving: false,
 			selected: {},
 			pages: [],
-			filter: '',
+			assets: [],
+			customMenu: true,
 			pid: Number(window.location.href.split('editor/')[1].split('/')[0]),
 			editor: this.editor,
 			
@@ -120,21 +136,38 @@ class EditorContextProvider extends Component {
 
 		document.title = res.data.title || res.data.name
 	}
-
 	
 	updateContent = async () => {
 		
 		this.setState({ ...this.state, loading: true })
 		let page = this.state.selected
 
+		page.css = this.editor.getCss();
+		page.html = this.editor.getHtml().split('</body>')[0]+'</body>'
+		page.js = this.editor.getJs()
+
+
 		let content = this.editor.getProjectData()
+
+		// Manage assets
+		let deleteAssetsIDs = []
+		let newAssets = content.assets.filter( asset => !asset.id )
+		let allAssetIDs = content.assets.map( asset => asset.id )
+		
+		this.state.assets.forEach(asset => {
+			if(!allAssetIDs.includes(asset.id)){
+				deleteAssetsIDs.push(asset.id)
+			}
+		})
+
+
 		delete content.assets
 		page.content = JSON.stringify(content)
 		page.projectID = page.projectID || this.state.pages[0].projectID
 
 		let req = await fetch(`/api/page/update`, {
 			method: 'POST',
-			body: JSON.stringify(page),
+			body: JSON.stringify({page, newAssets, deleteAssetsIDs}),
 			headers: {
 				'content-type': 'application/json',
 				...getAuth()
@@ -144,9 +177,12 @@ class EditorContextProvider extends Component {
 
 		toast[(res.success ? 'success':'error')](res.message)
 		page.content = content
-
-		this.setState({ ...this.state, selected: page, loading: false })
-
+		// update assets
+		let assets = this.state.assets.filter(asset => !deleteAssetsIDs.includes(asset.id))
+		assets = [...assets, ...res.data.assets]
+		this.editor.AssetManager.clear()
+		this.editor.AssetManager.add(assets)
+		this.setState({ ...this.state, selected: page, assets, loading: false })
 		document.title = page.title || page.name
 	}
 
@@ -167,50 +203,16 @@ class EditorContextProvider extends Component {
 			console.log(e)
 			alert('Error loading page data')
 		}
-		this.setState({ ...this.state, pages: res.data.pages, selected, loading: false })
+		this.setState({ ...this.state, pages: res.data.pages, selected, assets: res.data.assets, loading: false })
 		this.editor.loadProjectData(selected.content)
+		this.editor.AssetManager.add(this.state.assets)
 		document.title = res.data.selected.title || res.data.selected.name
 	}
-
-	/* renamePage = () => {
-		let name = prompt("Rename page", this.state.selected.name)
-		let selected = this.state.selected
-		let counter = 0;
-
-		selected.name = name ? name.replace(/\s/gi, '_').replace(/[^a-zA-Z0-9_]/gi, '').toLowerCase().slice(0,30) : name;
-
-		let pages = this.state.pages.map( page => {
-			if(page.id == selected.id){
-				page.name = selected.name
-			}
-
-			if( page.name == selected.name && page.id !== selected.id){
-				counter++
-			}
-
-			if(Number( page.name.split(selected.name)[1]?.replaceAll('_', '') ) >= counter ){
-				console.log(page.name.split(selected.name)[1]?.replaceAll('_', ''))
-				counter = Number( page.name.split(selected.name)[1].replaceAll('_', '') ) + 1
-			}
-			
-			if(counter > 0 && page.id == selected.id){
-				console.log(page.name.split(selected.name)[1]?.replaceAll('_', ''))
-				selected.name = selected.name + '_' + counter
-				page.name = selected.name
-				counter = 0
-			}
-			return page
-		})
-
-		
-		document.title = selected.title || selected.name
-		this.setState({...this.state, pages, selected})
-	} */
 
 	loadPage = async (page) => {
 		
 		if(page.id == this.state.selected.id){
-			console.log('on current page')
+			// console.log('on current page')
 			return page
 		}
 
@@ -232,6 +234,7 @@ class EditorContextProvider extends Component {
 
 		this.setState({ ...this.state, selected, loading: false })
 		if(res.data.content && selected.content.styles){
+			selected.content.assets = this.state.assets
 			this.editor.loadProjectData(selected.content)
 		}else{
 			this.editor.Commands.run('core:canvas-clear')
@@ -240,67 +243,74 @@ class EditorContextProvider extends Component {
 		return res
 	}
 
-
-
 	loadEditor = (container) => {
 		this.editor = grapesjs.init({
 			container,
 			components: '<div class="txt-red">Hello world!</div>',
 			style: '.txt-red{color: red}',
-			plugins: [gsCustom, gsTab, gsWebpage],
-			pluginsOpts: {
-				'grapesjs-plugin-export': { }
-			},
-			richTextEditor: {
-				// options
-			},
+			plugins: [gsCustom, gsTab, gsWebpage, gsTUI, gsBackground, gsFilter, gsGradient, gsFlexbox, gsSlider, gsTooltip],
+			// pluginsOpts: {
+			// 	'grapesjs-plugin-export': { }
+			// },
 			showOffsets: 1,
 			noticeOnUnload: 0,
 			height: '100vh',
 			fromElement: true,
 			storageManager: { autoload: 0 },
-			/* styleManager : {
-			  sectors: [{
-				  name: 'General',
-				  open: false,
-				  buildProps: ['float', 'display', 'position', 'top', 'right', 'left', 'bottom']
-				},{
-				  name: 'Flex',
-				  open: false,
-				  buildProps: ['flex-direction', 'flex-wrap', 'justify-content', 'align-items', 'align-content', 'order', 'flex-basis', 'flex-grow', 'flex-shrink', 'align-self']
-				},{
-				  name: 'Dimension',
-				  open: false,
-				  buildProps: ['width', 'height', 'max-width', 'min-height', 'margin', 'padding'],
-				},{
-				  name: 'Typography',
-				  open: false,
-				  buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-shadow'],
-				},{
-				  name: 'Decorations',
-				  open: false,
-				  buildProps: ['border-radius-c', 'background-color', 'border-radius', 'border', 'box-shadow', 'background'],
-				},{
-				  name: 'Extra',
-				  open: false,
-				  buildProps: ['transition', 'perspective', 'transform'],
-				}
-			  ],
-			}, */
-
+			assetManager: {
+				// Upload endpoint, set `false` to disable upload, default `false`
+				upload: '/api/image/upload',
+				headers: getAuth(),
+				multiUpload: false,
+				// assets: this.state.assets,
+			
+				// The name used in POST to pass uploaded files, default: `'files'`
+				uploadName: 'image',
+			}
 		});
 		this.setState({...this.state, editor: this.editor})
 
+		this.editor.on('asset:upload:start', () => {
+			// console.log('starting upload')
+		});
+		  
+		// The upload is ended (completed or not)
+		this.editor.on('asset:upload:end', () => {
+			// console.log('ending upload')
+		});
+		  
+		// Error handling
+		this.editor.on('asset:upload:error', () => {
+			console.log('error upload')
+		});
+		  
+		// Do something on response
+		this.editor.on('asset:upload:response', (response) => {
+			// console.log('upload response', {response})
+		});
+
+
+		this.editor.on('run', (commandId) => {
+			// console.log('Run', commandId);
+			switch(commandId){
+				case 'preview': this.setState({...this.state, customMenu: false})
+			}
+		  });
+		  
+		this.editor.on('stop', commandId => {
+			// console.log('Stop', commandId);
+
+			switch(commandId){
+				case 'preview': this.setState({...this.state, customMenu: true})
+			}
+		  });
 
 		var pn = this.editor.Panels;
-		var modal = this.editor.Modal;
-		var cmdm = this.editor.Commands;
+		/* var modal = this.editor.Modal;
+		var cmdm = this.editor.Commands; */
 
 		// Add and beautify tooltips
-		[['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'],
-		['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'],
-		['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']]
-		.forEach(function(item) {
+		menuBtns.forEach(function(item) {
 			pn.getButton('options', item[0]).set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
 		});
 		[['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks']]
@@ -318,25 +328,24 @@ class EditorContextProvider extends Component {
 			el.setAttribute('data-tooltip', title);
 			el.setAttribute('title', '');
 		}
-		this.editor.on('core:preview', () => {
-			console.log('preview')
-		})
+
 		window.editor = this.editor
 	}
 
 
 
 	deletePage = async () => {
-		let toastID = toast.loading('Deleting note...')
-		let req = await fetch(`/api/note/${this.state.selectedNote.id}`, {
+		// Modifications required
+		/* let toastID = toast.loading('Deleting note...')
+		let req = await fetch(`/api/note/${this.state.page.id}`, {
 			method: 'DELETE',
 		})
 		let res = await req.json()
-		let Editor = this.state.Editor.filter(n => n.id !== this.state.selectedNote.id)
+		let page = this.state.pages.filter(n => n.id !== this.state.page.id)
 		let recyclebin = [...this.state.recyclebin, this.state.selectedNote]
 		this.setState({ ...this.state, Editor, recyclebin, selectedNote: {} })
 		window.history.pushState({}, '', `/dashboard/`)
-		toast.update(toastID, {...toastOptions, render: 'Moved to recycle bin', type: 'success' })
+		toast.update(toastID, {...toastOptions, render: 'Moved to recycle bin', type: 'success' })*/
 	}
 	
 

@@ -22,6 +22,10 @@ const Project = sequelize.define('Project', {
 		type: DataTypes.STRING,
         allowNull: true,
 	},
+	filesPath: {
+		type: DataTypes.STRING,
+        allowNull: false,
+	},
 	nginxFilePath: {
 		type: DataTypes.STRING,
         allowNull: true,

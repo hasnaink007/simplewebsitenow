@@ -28,6 +28,40 @@ projectsRoutes.route("/api/projects").get( async (req, res) => {
 	res.success('', projects)
 })
 
+
+const createProjectRootDir = (project) => {
+
+	const fs = require('fs');
+	const path = require('path');
+
+	let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
+	if (!fs.existsSync(dir)) {
+		fs.mkdirSync(dir);
+	}
+
+	let nginxFile = `server {
+		listen 80;
+		listen [::]:80;
+ 
+		server_name ${project.domainName};
+ 
+		root ${dir};
+		index index.html;
+ 
+		location / {
+				try_files $uri $uri/ =404;
+		}
+ 	}`
+
+	fs.writeFile( dir +'/'+ project.filesPath, nginxFile, function (err) {
+		if (err) throw err;
+		console.log('Saved!');
+	});
+
+
+}
+
+
 // Add/Update user project
 projectsRoutes.route("/api/project/save").post( async (req, res) => {
 
@@ -42,7 +76,12 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 				project.domainName = req.body.domainName
 				project.isSubDomain = true
 
+				// @TODO Remove below 2 lines when mature
+				project.filesPath = project.filesPath || (new Date().getTime() + '' + new Date().getUTCMilliseconds())
+				createProjectRootDir(project)
+
 				record = await project.save()
+
 
 				// Update index page
 				let newIndex = await Page.findOne({where: { projectID: project.id, id: req.body.indexPage }})
@@ -66,8 +105,17 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 				description: req.body.description,
 				ownerID: req.user.id,
 				isSubDomain: true,
+				filesPath: (new Date().getTime() + '' + new Date().getUTCMilliseconds())
 			})
 			record = await project.save()
+			
+			createProjectRootDir(project)
+			
+			const dir = path.resolve(path.join(__dirname, `../../sites/${record.filesPath}`));
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir);
+			}
+
 			let page = await Page.create({
 				name: 'index',
 				type: 'index',

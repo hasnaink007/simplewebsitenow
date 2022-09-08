@@ -1,0 +1,13 @@
+server {
+		listen 80;
+		listen [::]:80;
+ 
+		server_name t1;
+ 
+		root /opt/lampp/htdocs/MERN/SimpleWebsiteNow/sites/1662558880284284;
+		index index.html;
+ 
+		location / {
+				try_files $uri $uri/ =404;
+		}
+ 	}

@@ -58,6 +58,7 @@ app.use("/api/project*", AuthenticateRoute)
 app.use("/api/page*", AuthenticateRoute)
 // app.use("/api/page*", AuthenticateRoute)
 app.use("/api/coupons*", AuthenticateRoute)
+app.use("/api/image/upload*", AuthenticateRoute)
 
 
 // Routes
@@ -65,6 +66,7 @@ app.use(require("./api/user"))
 app.use(require("./api/projects"))
 app.use(require("./api/pages"))
 app.use(require("./api/coupon"))
+app.use(require("./api/image_upload"))
 
 
 

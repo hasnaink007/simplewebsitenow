@@ -31,7 +31,7 @@ class EditorComponent extends Component {
 		}
 		return (
 			<>
-				<EditorMenu/>
+				{this.context.customMenu && <EditorMenu/>}
 				<div id="editor"></div>
 			</>
 		)
