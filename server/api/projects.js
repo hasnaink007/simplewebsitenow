@@ -60,7 +60,7 @@ const createProjectRootDir = (project) => {
 
 	const { exec } = require('child_process');
 	
-	let oldFilePath = `rm /etc/nginx/sites-enabled/${project.filesPath}`
+	let oldFilePath = `/etc/nginx/sites-enabled/${project.filesPath}`
 	exec( `[ -f ${oldFilePath} ] && rm ${oldFilePath}`, (err, stdout, stderr) => {
 		if (err) {
 			console.error(err)
