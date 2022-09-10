@@ -61,35 +61,48 @@ const createProjectRootDir = (project) => {
 	const { exec } = require('child_process');
 	
 	let oldFilePath = `/etc/nginx/sites-enabled/${project.filesPath}`
-	exec( `[ -f ${oldFilePath} ] && rm ${oldFilePath}`, (err, stdout, stderr) => {
-		if (err) {
-			console.error(err)
-		} else {
-			console.log(`Old Symlink delted:`)
-			exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
-				if (err) {
-					console.error(err)
-				} else {
-					console.log(`Symlink Result:`)
-					exec( 'find /etc/nginx/sites-enabled/ -xtype l -delete', (err, stdout, stderr) => {
-						if (err) {
-							console.error(err)
-						} else {
-							console.log(`Delete results:`)
-							
-							exec('service nginx reload', (err, stdout, stderr) => {
-								if (err) {
-									console.error(err)
-								} else {
-									console.log(`Nginx reload results:`)
-								}
-							})
-						}
-					})
-				}
-			})
-		}
-	})
+
+
+	const continueWithSymLink = async () => {
+		return exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
+			if (err) {
+				console.error(err)
+			} else {
+				console.log(`Symlink Result:`)
+				exec( 'find /etc/nginx/sites-enabled/ -xtype l -delete', (err, stdout, stderr) => {
+					if (err) {
+						console.error(err)
+					} else {
+						console.log(`Delete results:`)
+						
+						exec('service nginx reload', (err, stdout, stderr) => {
+							if (err) {
+								console.error(err)
+							} else {
+								console.log(`Nginx reload results:`)
+							}
+						})
+					}
+				})
+			}
+		})
+	}
+
+
+	if (!fs.existsSync(oldFilePath)) {
+		fs.unlink(oldFilePath, (err) => {
+			if (err) {
+		  		console.error('removing file error',err)
+		  		return
+			}else{
+				console.log(`Old Symlink delted:`)
+				continueWithSymLink()
+			}
+			//file removed
+		})
+	}else{
+		continueWithSymLink()
+	}
 }
 
 
