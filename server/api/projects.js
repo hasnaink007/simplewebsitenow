@@ -60,9 +60,6 @@ const createProjectRootDir = (project) => {
 
 	const { exec } = require('child_process');
 	
-	let oldFilePath = `/etc/nginx/sites-enabled/${project.filesPath}`
-
-
 	const continueWithSymLink = async () => {
 		return exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
 			if (err) {
@@ -87,9 +84,10 @@ const createProjectRootDir = (project) => {
 			}
 		})
 	}
-
-
-	if (!fs.existsSync(oldFilePath)) {
+	
+	
+	let oldFilePath = `/etc/nginx/sites-enabled/${project.filesPath}`
+	if (fs.existsSync(oldFilePath)) {
 		fs.unlink(oldFilePath, (err) => {
 			if (err) {
 		  		console.error('removing file error',err)
