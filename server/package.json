@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "dev": "nodemon index.js",
+    "dev": "node index.js",
     "start": "node index.js"
   },
   "author": "",
@@ -23,7 +23,6 @@
     "multer-s3": "^3.0.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
-    "nodemon": "^2.0.19",
     "sequelize": "^6.21.4"
   }
 }
