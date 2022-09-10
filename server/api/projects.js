@@ -107,10 +107,13 @@ const createProjectRootDir = (project) => {
 // Add/Update user project
 projectsRoutes.route("/api/project/chackavailbility").post( async (req, res) => {
 
-	if(req.body.domain?.replace(/[^a-zA-Z0-9\.\_]/gi, '')?.length < 4){
+	if(req.body.domain?.replace(/[^a-zA-Z0-9]/gi, '')?.length < 3){
 		res.error('Domain name is not available', {})
+		return
 	}
-	let project = await Project.findOne({where: { domainName: req.body.domain, isSubDomain: true }})
+	domainName = req.body.domain?.replace(/[^a-zA-Z0-9\.\_]/gi, '')
+
+	let project = await Project.findOne({where: { domainName, isSubDomain: true }})
 	if(project){
 		res.error('Domain name is not available', {})
 	}else{
@@ -121,7 +124,8 @@ projectsRoutes.route("/api/project/chackavailbility").post( async (req, res) => 
 projectsRoutes.route("/api/project/save").post( async (req, res) => {
 
 	let domainName = req.body.domainName?.replace(/[^a-zA-Z0-9\.\_]/ig, '')?.toLowerCase()?.substring(0,50)
-	if(!domainName || domainName.length < 4){
+	
+	if(!domainName || domainName.replace(/[^a-zA-Z0-9]/).length < 3){ 
 		res.error('The selected domain name is not available.')
 		return
 	}

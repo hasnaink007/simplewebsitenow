@@ -63,6 +63,14 @@ class ProjectContextProvider extends Component {
 			toast.error(res.message)
 			return
 		}
+		let projects = this.state.projects
+		if( pid ){
+			projects = projects.map(p => p.id == pid ? res.data : p)
+		}else{
+			projects.push(res.data)
+		}
+
+		this.setState({...this.state, projects})
 		toast.success(res.message)
 	}
 
