@@ -55,7 +55,7 @@ const createProjectRootDir = (project) => {
 
 	fs.writeFile( dir +'/'+ project.filesPath, nginxFile, function (err) {
 		if (err) throw err;
-		console.log('Saved!');
+		console.log('Nginx file updated for: '+ project.filesPath);
 	});
 
 	const { exec } = require('child_process');
@@ -64,23 +64,23 @@ const createProjectRootDir = (project) => {
 		if (err) {
 			console.error(err)
 		} else {
-			console.log(`Old Symlink delted:`, {stdout, stderr})
+			console.log(`Old Symlink delted:`)
 			exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
 				if (err) {
 					console.error(err)
 				} else {
-					console.log(`Symlink Result:`, {stdout, stderr})
-					exec( 'find -L /etc/nginx/sites-enabled -maxdepth 1 -type l -exec rm -i {} \;', (err, stdout, stderr) => {
+					console.log(`Symlink Result:`)
+					exec( 'find /etc/nginx/sites-enabled/ -xtype l -delete', (err, stdout, stderr) => {
 						if (err) {
 							console.error(err)
 						} else {
-							console.log(`Delete results:`, {stdout, stderr})
+							console.log(`Delete results:`)
 							
 							exec('service nginx reload', (err, stdout, stderr) => {
 								if (err) {
 									console.error(err)
 								} else {
-									console.log(`Nginx reload results:`, {stdout, stderr})
+									console.log(`Nginx reload results:`)
 								}
 							})
 						}
