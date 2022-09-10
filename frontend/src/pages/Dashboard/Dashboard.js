@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import {toast} from 'react-toastify';
+
 import {BiEdit} from 'react-icons/bi';
 import {RiDeleteBin3Line} from 'react-icons/ri';
 import {GoRepoClone} from 'react-icons/go';
@@ -55,6 +57,23 @@ class EditorComponent extends Component {
 		this.setState({...this.state, settings: <></>})
 	}
 
+	openPreview = project => {
+		if(project.isSubDomain){
+			window.open('http://'+ project.domainName + '.simplewebsitenow.com')
+		}else{
+			window.open('http://'+ project.domainName)
+		}
+	}
+
+	shareLink = (project) => {
+		if(project.isSubDomain){
+			navigator.clipboard.writeText('http://'+ project.domainName + '.simplewebsitenow.com')
+		}else{
+			navigator.clipboard.writeText('http://'+ project.domainName)
+		}
+		toast.success('URL copied!')
+	}
+
 	render() {
 		return (
 			<Wrapper>
@@ -78,8 +97,8 @@ class EditorComponent extends Component {
 										<Link  to={`/editor/${project.id}`}><BiEdit title="Edit"/></Link>
 										<GoRepoClone title="Clone"/>
 										<RiDeleteBin3Line title="Delete"/>
-										<MdPreview title="Preview"/>
-										<FiShare2 title="Share"/>
+										<MdPreview title="Preview" onClick={e => this.openPreview(project)}/>
+										<FiShare2 title="Share"  onClick={e => this.shareLink(project)}/>
 										<BsThreeDotsVertical title="Options" onClick={e => this.settings(project)}/>
 									</div>
 								</div>

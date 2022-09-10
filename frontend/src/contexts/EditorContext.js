@@ -270,18 +270,21 @@ class EditorContextProvider extends Component {
 		});
 		this.setState({...this.state, editor: this.editor})
 
+		let toastID = ''
 		this.editor.on('asset:upload:start', () => {
 			// console.log('starting upload')
+			toastID = toast.loading('Uploading image...')
 		});
 		  
 		// The upload is ended (completed or not)
 		this.editor.on('asset:upload:end', () => {
 			// console.log('ending upload')
+			toast.update(toastID,{...toastOptions, type:'success', render: 'Image uploaded.'})
 		});
-		  
+		
 		// Error handling
 		this.editor.on('asset:upload:error', () => {
-			console.log('error upload')
+			toast.update(toastID,{...toastOptions, type:'error', render: 'Error uploading image.'})
 		});
 		  
 		// Do something on response

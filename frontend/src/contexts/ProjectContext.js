@@ -18,6 +18,7 @@ class ProjectContextProvider extends Component {
 			loadProjects: this.loadProjects,
 			updateSettings: this.updateSettings,
 			deleteProject: this.deleteProject,
+			chackDomainAvailability: this.chackDomainAvailability,
 			saveProject: this.saveProject,
 			createProject: this.createProject,
 		}
@@ -59,17 +60,24 @@ class ProjectContextProvider extends Component {
 		})
 		let res = await req.json()
 		if(!res.success){
-			toast.error('Error loading pages data')
+			toast.error(res.message)
 			return
 		}
 		toast.success(res.message)
-		// let projects = this.state.projects.map(p => {
-		// 	if(p.id == pid){
-		// 		p.pages = res.data.pages
-		// 	}
-		// 	return p
-		// })
-		
+	}
+
+	chackDomainAvailability = async (domain) => {
+
+		let req = await fetch(`/api/project/chackavailbility`, {
+			headers: {
+				'content-type': 'application/json',
+				...getAuth()
+			},
+			method: 'POST',
+			body: JSON.stringify({ domain })
+		})
+		let res = await req.json()
+		return res;
 	}
 
 	deleteProject = async () => {

@@ -79,6 +79,10 @@ h6{
 
 button{
   @include generic-btn;
+
+  &[disabled]{
+    cursor: not-allowed !important;
+  }
 }
 
 .pagePreloader{

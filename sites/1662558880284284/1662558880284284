@@ -2,7 +2,7 @@ server {
 		listen 80;
 		listen [::]:80;
  
-		server_name t1;
+		server_name test.simplewebsitenow.com www.test.simplewebsitenow.com;
  
 		root /opt/lampp/htdocs/MERN/SimpleWebsiteNow/sites/1662558880284284;
 		index index.html;

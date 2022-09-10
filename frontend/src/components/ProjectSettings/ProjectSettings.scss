@@ -50,8 +50,8 @@
 			width: fit-content;
 
 			svg{
-				height: 20px;
-				width: 20px;
+				height: 25px;
+				width: 25px;
 				border-radius: 100%;
 				background: transparent;
 				fill: red;
@@ -67,6 +67,63 @@
 				// grid-template-columns: 1fr 1fr;
 				grid-gap: 15px;
 				align-items: end;
+
+				.subdomain_option{
+					display: grid;
+					grid-template-columns: 2fr 1fr;
+					color: #333;
+
+					label{
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+
+						input{
+							width: 20px;
+							height: 20px;
+						}
+					}
+				}
+
+				.dmn_search{
+					display: flex;
+
+					input{
+						border-radius: 7px 0 0 7px;
+						outline: none;
+					}
+					button.search_dmn{
+						width: 50px;
+						border-radius: 0px 5px 5px 0px;
+						height: 40px;
+						padding: 7px;
+						font-size: 25px;
+
+						&.invalid{
+							background-color: red;
+						}
+
+						&.searching, &.check_availability{
+							background-color: #f1c40f;
+						}
+						
+						&.selected{
+							background-color: #07bc0c;
+						}
+
+						.loading{
+							animation: rotate 2s infinite cubic-bezier(0.59, 0.26, 0.51, 0.82);
+						}
+
+						@keyframes rotate {
+							from{
+								transform: rotate(0deg);
+							}to{
+								transform: rotate(360deg);
+							}
+						}
+					}
+				}
 
 				input, label, select, textarea{
 					width: 100%;

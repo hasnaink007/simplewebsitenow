@@ -58,12 +58,64 @@ const createProjectRootDir = (project) => {
 		console.log('Saved!');
 	});
 
-
+	const { exec } = require('child_process');
+	
+	exec( `rm /etc/nginx/sites-enabled/${project.filesPath}`, (err, stdout, stderr) => {
+		if (err) {
+			console.error(err)
+		} else {
+			console.log(`Old Symlink delted:`, {stdout, stderr})
+			exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
+				if (err) {
+					console.error(err)
+				} else {
+					console.log(`Symlink Result:`, {stdout, stderr})
+					exec( 'find -L /etc/nginx/sites-enabled -maxdepth 1 -type l -exec rm -i {} \;', (err, stdout, stderr) => {
+						if (err) {
+							console.error(err)
+						} else {
+							console.log(`Delete results:`, {stdout, stderr})
+							
+							exec('service nginx reload', (err, stdout, stderr) => {
+								if (err) {
+									console.error(err)
+								} else {
+									console.log(`Nginx reload results:`, {stdout, stderr})
+								}
+							})
+						}
+					})
+				}
+			})
+		}
+	})
 }
 
 
 // Add/Update user project
+projectsRoutes.route("/api/project/chackavailbility").post( async (req, res) => {
+	let project = await Project.findOne({where: { domainName: req.body.domain, isSubDomain: true }})
+	if(project){
+		res.error('Domain name is not available', {})
+	}else{
+		res.success('Domain name is available', {})
+	}
+})
+
 projectsRoutes.route("/api/project/save").post( async (req, res) => {
+
+	let domainName = req.body.domainName?.replace(/[^a-zA-Z0-9\.\_]/ig, '')?.toLowerCase()?.substring(0,50)
+	if(!domainName || domainName.length < 4){
+		res.error('Please select a valid domain name.')
+		return
+	}
+	let projectWithDomain = await Project.findOne({where: { domainName: req.body.domainName, isSubDomain: true }})
+
+	if(projectWithDomain && projectWithDomain.id != req.body.pid){
+		res.error('The selected domain name is not available.')
+		return
+	}
+
 
 	try{
 		let record;
@@ -73,7 +125,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 			if(project && project.ownerID && req.user && req.user.id && Number(project.ownerID) == Number(req.user.id)){
 				project.name = req.body.name
 				project.description = req.body.description
-				project.domainName = req.body.domainName
+				project.domainName = domainName
 				project.isSubDomain = true
 
 				// @TODO Remove below 2 lines when mature
@@ -104,6 +156,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 				name: req.body.name,
 				description: req.body.description,
 				ownerID: req.user.id,
+				domainName: domainName,
 				isSubDomain: true,
 				filesPath: (new Date().getTime() + '' + new Date().getUTCMilliseconds())
 			})
@@ -111,10 +164,10 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 			
 			createProjectRootDir(project)
 			
-			const dir = path.resolve(path.join(__dirname, `../../sites/${record.filesPath}`));
+			/* const dir = path.resolve(path.join(__dirname, `../../sites/${record.filesPath}`));
 			if (!fs.existsSync(dir)) {
 				fs.mkdirSync(dir);
-			}
+			} */
 
 			let page = await Page.create({
 				name: 'index',
