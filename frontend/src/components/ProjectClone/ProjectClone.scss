@@ -1,0 +1,218 @@
+@import "utils/theme.scss";
+
+#settings-popup-container-main{
+
+	z-index: 99;
+
+	&, .hiding_layout{
+		position: fixed;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100vw;
+		height: 100vh;
+		top: 0;
+		left: 0;
+		background: #00000060;
+		backdrop-filter: blur(1px);
+	}
+
+	.hiding_layout{
+		position: absolute;
+		z-index: -1;
+	}
+
+	.poopup_main_content{
+		position: relative;
+		width: 100%;
+		height: fit-content;
+		max-height: 80vh;
+		max-width: 500px;
+		background: #fff;
+		margin: auto;
+		border-radius: 10px;
+		padding: 15px;
+		overflow-y: auto;
+
+		h2{
+			color: #333;
+			margin: 0px 0px 10px;
+		}
+
+		.close_cross_btn{
+			padding: 0;
+			background: transparent;
+			border: 0;
+			cursor: pointer;
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			width: fit-content;
+
+			svg{
+				height: 25px;
+				width: 25px;
+				border-radius: 100%;
+				background: transparent;
+				fill: red;
+			}
+		}
+
+		.settings_popup_inner{
+			overflow: auto;
+			height: 100%;
+
+			.projectinfo_form{
+				display: grid;
+				// grid-template-columns: 1fr 1fr;
+				grid-gap: 15px;
+				align-items: end;
+
+				.subdomain_option{
+					display: grid;
+					grid-template-columns: 2fr 1fr;
+					color: #333;
+
+					label{
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+
+						input{
+							width: 20px;
+							height: 20px;
+						}
+					}
+				}
+
+				.dmn_search{
+					display: flex;
+
+					input{
+						border-radius: 7px 0 0 7px;
+						outline: none;
+					}
+					button.search_dmn{
+						width: 50px;
+						border-radius: 0px 5px 5px 0px;
+						height: 40px;
+						padding: 7px;
+						font-size: 25px;
+
+						&.invalid{
+							background-color: red;
+						}
+
+						&.searching, &.check_availability{
+							background-color: #f1c40f;
+						}
+						
+						&.selected{
+							background-color: #07bc0c;
+						}
+
+						.loading{
+							animation: rotate 2s infinite cubic-bezier(0.59, 0.26, 0.51, 0.82);
+						}
+
+						@keyframes rotate {
+							from{
+								transform: rotate(0deg);
+							}to{
+								transform: rotate(360deg);
+							}
+						}
+					}
+				}
+
+				input, label, select, textarea{
+					width: 100%;
+					color: #333;
+
+					span{
+						font-size: 16px;
+					}
+				}
+
+				input, select, textarea{
+					font-size: 15px;
+					border: 1px solid #ccc;
+					padding: 15px;
+					height: 40px;
+					border-radius: 5px;
+				}
+				select{
+					background: #fff;
+					padding: 0 15px 0 10px;
+				}
+				textarea{
+					height: 100px;
+					padding: 0 15px 0 10px;
+				}
+
+				button{
+					background: $secondary-light;
+					border-radius: 7px;
+					border: 0px solid transparent;
+					padding: 15px;
+					color: #fff;
+					font-size: 16px;
+					display: block;
+					max-width: 150px;
+					width: 100%;
+					margin-left: auto;
+					cursor: pointer;
+
+					&:hover{
+						background: $secondary;
+					}
+				}
+			}
+
+			.recycle_bin{
+				color: #333;
+				overflow: auto;
+				max-height: 250px;
+				padding-right: 5px;
+
+				.no_note_in_recyclebin{
+					text-align: center;;
+				}
+
+				&::-webkit-scrollbar {
+					width: 5px;
+				}
+				&::-webkit-scrollbar-track {
+					background: #ccc;
+				}
+				&::-webkit-scrollbar-thumb {
+					background: #ffb500;
+				}
+				&::-webkit-scrollbar-thumb:hover{
+					background: $primary;
+				}
+
+				.deleted_note{
+					padding: 10px;
+					border-bottom: 1px solid #ccc; 
+					cursor: pointer;
+					display: flex;
+					justify-content: space-between;
+					gap: 10px;
+					svg{
+						height: 20px;
+						width: 20px;
+					}
+
+					&:hover{
+						background: #efefef;
+					}
+				}
+			}
+		}
+
+
+	}
+
+
+}

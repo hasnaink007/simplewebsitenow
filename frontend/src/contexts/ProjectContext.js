@@ -17,6 +17,7 @@ class ProjectContextProvider extends Component {
 			
 			loadProjects: this.loadProjects,
 			updateSettings: this.updateSettings,
+			cloneProject: this.cloneProject,
 			deleteProject: this.deleteProject,
 			chackDomainAvailability: this.chackDomainAvailability,
 			saveProject: this.saveProject,
@@ -69,6 +70,29 @@ class ProjectContextProvider extends Component {
 		}else{
 			projects.push(res.data)
 		}
+
+		this.setState({...this.state, projects})
+		toast.success(res.message)
+	}
+	
+	cloneProject = async (data) => {
+
+		this.setState({ ...this.state, loading: true })
+		let req = await fetch(`/api/project/clone`, {
+			headers: {
+				'content-type': 'application/json',
+				...getAuth()
+			},
+			method: 'POST',
+			body: JSON.stringify(data)
+		})
+		let res = await req.json()
+		if(!res.success){
+			toast.error(res.message)
+			return
+		}
+		let projects = this.state.projects
+		projects.push(res.data)
 
 		this.setState({...this.state, projects})
 		toast.success(res.message)

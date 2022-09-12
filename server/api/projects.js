@@ -125,7 +125,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 
 	let domainName = req.body.domainName?.replace(/[^a-zA-Z0-9\.\_]/ig, '')?.toLowerCase()?.substring(0,50)
 	
-	if(!domainName || domainName.replace(/[^a-zA-Z0-9]/).length < 3){ 
+	if(!domainName || domainName.replace(/[^a-zA-Z0-9]/ig, '').length < 3){ 
 		res.error('The selected domain name is not available.')
 		return
 	}
@@ -206,6 +206,117 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 		res.error('Error saving project')
 	}
 })
+
+
+
+
+projectsRoutes.route("/api/project/clone").post( async (req, res) => {
+
+	let domainName = req.body.domainName?.replace(/[^a-zA-Z0-9\.\_]/ig, '')?.toLowerCase()?.substring(0,50)
+	
+	if(!domainName || domainName.replace(/[^a-zA-Z0-9]/ig, '').length < 3){ 
+		res.error('The selected domain name is not available.')
+		return
+	}
+	let projectWithDomain = await Project.findOne({where: { domainName: req.body.domainName, isSubDomain: true }})
+
+	if(projectWithDomain && projectWithDomain.id != req.body.pid){
+		res.error('The selected domain name is not available.')
+		return
+	}
+
+
+	try{
+		let record;
+
+		let projectToClone = await Project.findOne({where: {id: req.body.project_id, ownerID: req.user.id}})
+
+		if(!projectToClone){
+			res.error('Error cloning project!', {})
+			return
+		}
+
+		let project = await Project.create({
+			name: req.body.name,
+			description: projectToClone.description,
+			ownerID: req.user.id,
+			domainName: domainName,
+			isSubDomain: true,
+			filesPath: (new Date().getTime() + '' + new Date().getUTCMilliseconds())
+		})
+		record = await project.save()
+		project = await project.get()
+
+		// Copy all the pages
+		let pages = await Page.findAll({where: {projectID: projectToClone.id}})
+
+		let pagesToClone = []
+
+		pages.forEach(page => {
+			pagesToClone.push({
+				name: page.name,
+				title: page.title,
+				description: page.description,
+				type: page.type,
+				headerScripts: page.headerScripts,
+				content: page.content,
+				creatorID: req.user.id,
+				projectID: project.id,
+			})
+		})
+
+		await Page.bulkCreate(pagesToClone)
+
+		// Copy files
+
+		const fs = require('fs');
+		const path = require('path');
+		const { exec } = require('child_process');
+
+		let dir = path.resolve(path.join(__dirname, `../../sites/`));
+		if (!fs.existsSync(dir +'/'+ project.filesPath)) {
+			fs.mkdirSync(dir +'/'+ project.filesPath);
+		}
+
+		exec(`cp ${dir+'/'+projectToClone.filesPath}/* ${dir+'/'+project.filesPath}/`, (err, stdout, stderr) => {
+			if (err) {
+				console.error(err)
+			} else {
+				console.log(`All files copied!`)
+				createProjectRootDir(project)
+
+				if (fs.existsSync( dir +'/'+ project.filesPath + '/' + projectToClone.filesPath )) {
+					fs.unlink(dir +'/'+ project.filesPath + '/' + projectToClone.filesPath , (err) => {
+						if (err) {
+							console.error('removing file error',err)
+							return
+						}else{
+							console.log(`cloned project's nginx config deleted`)
+						}
+					})
+				}
+			}
+		})
+
+		pages = await Page.findAll({
+			where: {
+				projectID: project.id
+			},
+			attributes: ['name', 'id', 'projectID', 'type']
+		})
+		project = {...(project.dataValues || project), pages: (pages || []) }
+
+
+		res.success('Project Copied!', project)
+	}catch(e){
+		console.log(e)
+		res.error('Error cloning project')
+	}
+})
+
+
+
+
 
 
 // Delete user project permanently

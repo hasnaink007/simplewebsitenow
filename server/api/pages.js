@@ -143,6 +143,7 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 				let content = `<!DOCTYPE html>
 				<html>
 					<head>
+						<title>${JSON.stringify(page.title)}</title>
 						${page.headerScripts || ''}
 						<style>${req.body.page.css}</style>
 					</head>

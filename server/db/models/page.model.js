@@ -24,7 +24,8 @@ const Page = sequelize.define('Page', {
     },
     headerScripts: {
         type: DataTypes.STRING,
-		allowNull: true
+		allowNull: true,
+		defaultValue: ''
     },
 	creatorID: {
         // Define this as foriegn key below
