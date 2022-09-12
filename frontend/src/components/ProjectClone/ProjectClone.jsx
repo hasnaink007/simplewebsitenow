@@ -34,6 +34,7 @@ export default class ProjectClone extends Component {
 		this.setState({...this.state, disabled: true})
 		await this.context.cloneProject(data)
 		this.setState({...this.state, disabled: false})
+		this.props.hide()
 	}
 
 	searchDomain = async (e) => {
