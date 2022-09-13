@@ -39,6 +39,7 @@ class EditorContextProvider extends Component {
 			saving: false,
 			selected: {},
 			pages: [],
+			project: {},
 			assets: [],
 			customMenu: true,
 			pid: Number(window.location.href.split('editor/')[1].split('/')[0]),
@@ -203,7 +204,7 @@ class EditorContextProvider extends Component {
 			console.log(e)
 			alert('Error loading page data')
 		}
-		this.setState({ ...this.state, pages: res.data.pages, selected, assets: res.data.assets, loading: false })
+		this.setState({ ...this.state, pages: res.data.pages, selected, assets: res.data.assets, project: res.data.project, loading: false })
 		this.editor.loadProjectData(selected.content)
 		this.editor.AssetManager.add(this.state.assets)
 		document.title = res.data.selected.title || res.data.selected.name

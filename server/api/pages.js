@@ -32,7 +32,15 @@ pagesRoutes.route("/api/pages/:id").get( async (req, res) => {
 	if(!selected){
 		selected = await Page.findOne({where: { projectID: req.params.id }})
 	}
-	res.success('', {pages, selected, assets})
+
+	let p = {
+		name: project.name,
+		domainName: project.domainName,
+		isSubDomain: project.isSubDomain,
+		description: project.descrioption
+	}
+
+	res.success('', {pages, selected, assets, project: p})
 })
 
 // Create or save page

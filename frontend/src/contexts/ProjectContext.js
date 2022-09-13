@@ -66,8 +66,16 @@ class ProjectContextProvider extends Component {
 		}
 		let projects = this.state.projects
 		if( pid ){
-			projects = projects.map(p => p.id == pid ? res.data : p)
+			projects = projects.map(p => {
+				if( p.id == pid ){
+					res.data.pages = p.pages
+					return res.data
+				}else{
+					return p
+				}
+			})
 		}else{
+			res.data.pages = res.data.pages || []
 			projects.push(res.data)
 		}
 
@@ -97,6 +105,29 @@ class ProjectContextProvider extends Component {
 		this.setState({...this.state, projects})
 		toast.success(res.message)
 	}
+	
+	deleteProject = async (id) => {
+		let toastID = toast.loading('Deleting project and its assets...')
+
+		this.setState({ ...this.state, loading: true })
+		let req = await fetch(`/api/project/${id}`, {
+			headers: {
+				'content-type': 'application/json',
+				...getAuth()
+			},
+			method: 'DELETE',
+		})
+		let res = await req.json()
+
+		if(res.success){
+			let projects = this.state.projects.filter(p => p.id != id)
+			this.setState({...this.state, projects})
+			toast.update(toastID, {...toastOptions, type: 'success', render: res.message })
+		}else{
+			toast.update(toastID, {...toastOptions, type: 'error', render: res.message })
+		}
+		return res
+	}
 
 	chackDomainAvailability = async (domain) => {
 
@@ -111,20 +142,6 @@ class ProjectContextProvider extends Component {
 		let res = await req.json()
 		return res;
 	}
-
-	deleteProject = async () => {
-		let toastID = toast.loading('Deleting note...')
-		let req = await fetch(`/api/note/${this.state.selectedNote.id}`, {
-			method: 'DELETE',
-		})
-		let res = await req.json()
-		let Editor = this.state.Editor.filter(n => n.id !== this.state.selectedNote.id)
-		let recyclebin = [...this.state.recyclebin, this.state.selectedNote]
-		this.setState({ ...this.state, Editor, recyclebin, selectedNote: {} })
-		window.history.pushState({}, '', `/dashboard/`)
-		toast.update(toastID, {...toastOptions, render: 'Moved to recycle bin', type: 'success' })
-	}
-	
 
 	render() {
 		return (

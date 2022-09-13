@@ -13,6 +13,7 @@ import { ProjectContext } from 'contexts/ProjectContext';
 import Wrapper from 'pages/Wrapper';
 import ProjectSettings from 'components/ProjectSettings/ProjectSettings';
 import ProjectClone from 'components/ProjectClone/ProjectClone';
+import DeleteProject from 'components/DeleteProject/DeleteProject';
 
 // import EmailEditor from 'react-email-editor'
 
@@ -34,8 +35,7 @@ class EditorComponent extends Component {
 		super(props)
 		this.state = {
 			saving: '',
-			settings: <></>,
-			cloneProject: <></>,
+			popup: <></>,
 		}
 	}
 
@@ -52,15 +52,19 @@ class EditorComponent extends Component {
     }
 	
 	settings = (project) => {
-		this.setState({...this.state, settings: <ProjectSettings hide={this.hideSttings} project={project} />})    
+		this.setState({...this.state, popup: <ProjectSettings hide={this.hidePopup} project={project} />})    
     }
 
 	cloneProject = (project) => {
-		this.setState({...this.state, settings: <ProjectClone hide={this.hideSttings} project={project} />})    
+		this.setState({...this.state, popup: <ProjectClone hide={this.hidePopup} project={project} />})    
     }
+	
+	confirmDelete = project => {
+		this.setState({...this.state, popup: <DeleteProject hide={this.hidePopup} project={project} />})    
+	}
 
-	hideSttings = () => {
-		this.setState({...this.state, settings: <></>, cloneProject: <></>})
+	hidePopup = () => {
+		this.setState({...this.state, popup: <></>})
 	}
 
 	openPreview = project => {
@@ -80,12 +84,12 @@ class EditorComponent extends Component {
 		toast.success('URL copied!')
 	}
 
+
 	render() {
 		return (
 			<Wrapper>
 				<div className="dashboard">
-					{this.state.settings}
-					{this.state.cloneProject}
+					{this.state.popup}
 					
 					<div className="dashboard_header">
 						<h1>Projects <small>({this.context.projects.length})</small></h1>
@@ -104,7 +108,7 @@ class EditorComponent extends Component {
 									<div className="p_card_footer">
 										<Link  to={`/editor/${project.id}`}><BiEdit title="Edit"/></Link>
 										<GoRepoClone title="Clone" onClick={e => this.cloneProject(project)}/>
-										<RiDeleteBin3Line title="Delete"/>
+										<RiDeleteBin3Line title="Delete" onClick={e => this.confirmDelete(project)}/>
 										<MdPreview title="Preview" onClick={e => this.openPreview(project)}/>
 										<FiShare2 title="Share"  onClick={e => this.shareLink(project)}/>
 										<BsThreeDotsVertical title="Options" onClick={e => this.settings(project)}/>

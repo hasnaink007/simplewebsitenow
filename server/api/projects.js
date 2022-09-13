@@ -1,7 +1,10 @@
 const express = require("express");
 const Project = require("../db/models/project.model");
-const { Op } = require("sequelize");
+const { QueryTypes } = require("sequelize");
 const Page = require("../db/models/page.model");
+const { exec } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const projectsRoutes = express.Router();
 
@@ -31,9 +34,6 @@ projectsRoutes.route("/api/projects").get( async (req, res) => {
 
 const createProjectRootDir = (project) => {
 
-	const fs = require('fs');
-	const path = require('path');
-
 	let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
 	if (!fs.existsSync(dir)) {
 		fs.mkdirSync(dir);
@@ -57,8 +57,6 @@ const createProjectRootDir = (project) => {
 		if (err) throw err;
 		console.log('Nginx file updated for: '+ project.filesPath);
 	});
-
-	const { exec } = require('child_process');
 	
 	const continueWithSymLink = async () => {
 		return exec( `ln -s ${dir}/${project.filesPath} /etc/nginx/sites-enabled/`, (err, stdout, stderr) => {
@@ -158,14 +156,29 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 				// Update index page
 				let newIndex = await Page.findOne({where: { projectID: project.id, id: req.body.indexPage }})
 				let oldIndex = await Page.findOne({where: { projectID: project.id, type: 'index' }})
-				if(newIndex){
-					if(oldIndex){
+				
+				if(newIndex && newIndex.type != 'index'){
+					
+					if(oldIndex && oldIndex.type == 'index'){
 						oldIndex.type = 'page',
 						await oldIndex.save()
 					}
+
 					newIndex.type = 'index'
 					await newIndex.save()
-					// console.log({oldIndex, newIndex})
+
+					// let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
+					
+					/* if (fs.existsSync(dir)) {
+						exec( `mv ${filePath}`, (err, stdout, stderr) => {
+							if (err) {
+								console.error(err)
+							} else {
+								console.log(`Symlink Deleted`)
+							}
+						})
+					} */
+
 				}
 			}else{
 				res.error('Error updating project')
@@ -209,7 +222,58 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 
 
 
+// Delete the project
+projectsRoutes.route("/api/project/:id").delete( async (req, res) => {
+	
+	let db = require('../db/connection.config')
+	let project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
+	
+	if(!project){
+		res.error('Project not found.')
+		return
+	}
 
+	// Delete all the assets from the DB
+	// @TODO: Delete from godaddy spaces as well
+	let assets = await db.query('DELETE FROM Assets where projectID = ?', { replacements: [project.id || -1], type: QueryTypes.DELETE })
+	
+	// Delete all the Pages
+	let pages = await db.query('DELETE FROM Pages where projectID = ?', { replacements: [project.id || -1], type: QueryTypes.DELETE })
+
+	let dir = path.resolve(path.join(__dirname, `../../sites/${project.filesPath}`));
+
+	exec( `rm -r ${dir}`, (err, stdout, stderr) => {
+		if (err) {
+			console.error(err)
+		} else {
+			console.log(`Files deleted.`)
+			
+			exec( `rm -r /etc/nginx/sites-enabled/${project.filesPath}`, (err, stdout, stderr) => {
+				if (err) {
+					console.error(err)
+				} else {
+					console.log(`Symlink Deleted`)
+				}
+			})
+
+			exec('service nginx reload', (err, stdout, stderr) => {
+				if (err) {
+					console.error(err)
+				} else {
+					console.log(`Nginx reloaded`)
+				}
+			})
+		}
+	})
+
+	await project.destroy()
+
+	res.success('Project deleted.')
+})
+
+
+
+// Clone project
 projectsRoutes.route("/api/project/clone").post( async (req, res) => {
 
 	let domainName = req.body.domainName?.replace(/[^a-zA-Z0-9\.\_]/ig, '')?.toLowerCase()?.substring(0,50)
@@ -268,10 +332,6 @@ projectsRoutes.route("/api/project/clone").post( async (req, res) => {
 		await Page.bulkCreate(pagesToClone)
 
 		// Copy files
-
-		const fs = require('fs');
-		const path = require('path');
-		const { exec } = require('child_process');
 
 		let dir = path.resolve(path.join(__dirname, `../../sites/`));
 		if (!fs.existsSync(dir +'/'+ project.filesPath)) {

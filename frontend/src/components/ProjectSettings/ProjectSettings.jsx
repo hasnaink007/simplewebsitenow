@@ -34,10 +34,8 @@ export default class ProjectSettings extends Component {
 
 	searchDomain = async (e) => {
 		e.preventDefault()
-		console.log({state: this.state, e})
 		this.setState({...this.state, searching: true})
 		let res = await this.context.chackDomainAvailability(this.state.domainName)
-		console.log(res)
 		// this.setState({...this.state, searching: false})
 		let message = <div style={{color: res.success ? '#07bc0c' : 'red', marginTop: '-15px', textAlign: 'right'}}><small><strong>http://{this.state.domainName}{this.state.isSubDomain ? '.simplewebsitenow.com': ''}</strong> is {res.success ? '': 'not'} available.</small></div>
 		if(res.success){
