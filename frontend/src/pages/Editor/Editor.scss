@@ -4,6 +4,27 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+
+    .gjs-sm-sectors.gjs-one-bg.gjs-two-color{
+        .gjs-sm-sector__general:nth-of-type(2n){
+            display: none !important;
+        }
+        .gjs-sm-sector__flex:nth-of-type(2n){
+            display: none !important;
+        }
+        .gjs-sm-sector__dimension:nth-of-type(2n){
+            display: none !important;
+        }
+        .gjs-sm-sector__typography:nth-of-type(2n){
+            display: none !important;
+        }
+        .gjs-sm-sector__decorations:nth-of-type(2n){
+            display: none !important;
+        }
+        .gjs-sm-sector__extra:nth-of-type(2n){
+            display: none !important;
+        }
+    }
 }
 
 

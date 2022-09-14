@@ -151,7 +151,7 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 				let content = `<!DOCTYPE html>
 				<html>
 					<head>
-						<title>${JSON.stringify(page.title)}</title>
+						<script id="title_script"> document.title = ${JSON.stringify(page.title)}; document.getElementById('title_script').remove();</script>
 						${page.headerScripts || ''}
 						<style>${req.body.page.css}</style>
 					</head>

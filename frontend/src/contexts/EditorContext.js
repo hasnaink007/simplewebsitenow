@@ -233,8 +233,15 @@ class EditorContextProvider extends Component {
 			alert('Error loading page data')
 		}
 
+		this.editor.destroy()
+		this.loadEditor('#editor')
+		// this.editor.loadProjectData(selected.content)
+		// this.editor.AssetManager.add(this.state.assets)
+		// document.title = res.data.selected.title || res.data.selected.name
+
 		this.setState({ ...this.state, selected, loading: false })
-		if(res.data.content && selected.content.styles){
+
+		if(selected.content && selected.content.styles){
 			selected.content.assets = this.state.assets
 			this.editor.loadProjectData(selected.content)
 		}else{
