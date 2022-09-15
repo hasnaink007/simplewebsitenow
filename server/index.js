@@ -59,6 +59,7 @@ app.use("/api/page*", AuthenticateRoute)
 // app.use("/api/page*", AuthenticateRoute)
 app.use("/api/coupons*", AuthenticateRoute)
 app.use("/api/image/upload*", AuthenticateRoute)
+app.use("/api/asset*", AuthenticateRoute)
 
 
 // Routes

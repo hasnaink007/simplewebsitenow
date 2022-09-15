@@ -3,6 +3,10 @@ const { S3Client } = require('@aws-sdk/client-s3');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 
+const Project = require("../db/models/project.model");
+const Page = require("../db/models/page.model");
+const Assets = require("../db/models/assets.model");
+
 const express = require('express');
 const router = express.Router();
 
@@ -38,7 +42,7 @@ const uploadToBucket = multer({
     key: function (req, file, cb) {
       // use file extension from the file mimetype
 
-      console.log(file)
+      // console.log(file)
       cb(null, `simplewebsitenow/${Date.now().toString()  }.${  file.mimetype.split('/')[1]}`)
     }
   }),
@@ -57,7 +61,41 @@ const uploadToBucket = multer({
 }).single('image')
 
 
+router.post('/api/asset', async (req, res) => {
 
+  // console.log(req.body)
+  let page = await Page.findOne({where : {id: req.body.pid}})
+  let project = await Project.findOne({ where: { id: page?.projectID, ownerID: req.user.id} })
+
+  if(!req.body.pid || !req.body.asset?.src || !Number(req.body.pid) || !page || !project){
+    res.error('Unauthorized!')
+    return
+  }
+
+  let asset = await Assets.create({
+    projectID: project.id,
+    src: req.body.asset.src
+  })
+  await asset.get()
+  res.success('done', asset)
+})
+
+
+// Delete an asset from the DB
+router.delete('/api/asset', async (req, res) => {
+
+  // console.log(req.body)
+  let asset = await Assets.findOne({where : {id: req.body.aid}})
+  let project = await Project.findOne({ where: { id: asset?.projectID, ownerID: req.user.id} })
+
+  if(!req.body.aid || !Number(req.body.aid) || !asset || !project){
+    res.error('Unauthorized!')
+    return
+  }
+
+  await asset.destroy()
+  res.success('done', asset)
+})
 
 
 router.post('/api/image/upload'/* , uploadToBucket.single('image') */, async (req, res) => {

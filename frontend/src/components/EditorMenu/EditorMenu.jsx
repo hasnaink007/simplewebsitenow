@@ -26,7 +26,7 @@ class EditorMenu extends Component {
 		this.setState({...this.state, settings: <></>})
 	}
 	changePage = (page, e) => {
-		console.log(this.context)
+		// console.log(this.context)
 		
 		this.setState({...this.state, showAll: false})
 		this.context.loadPage(page)

@@ -95,6 +95,7 @@ class EditorContextProvider extends Component {
 			}
 			counter = 0
 		}
+		data.name = data.name.toLowerCase()
 
 
 		let req = await fetch(`/api/page/save`, {
@@ -152,14 +153,14 @@ class EditorContextProvider extends Component {
 
 		// Manage assets
 		let deleteAssetsIDs = []
-		let newAssets = content.assets.filter( asset => !asset.id )
+		// let newAssets = content.assets.filter( asset => !asset.id )
 		let allAssetIDs = content.assets.map( asset => asset.id )
 		
-		this.state.assets.forEach(asset => {
+		/* this.state.assets.forEach(asset => {
 			if(!allAssetIDs.includes(asset.id)){
 				deleteAssetsIDs.push(asset.id)
 			}
-		})
+		}) */
 
 
 		delete content.assets
@@ -168,7 +169,7 @@ class EditorContextProvider extends Component {
 
 		let req = await fetch(`/api/page/update`, {
 			method: 'POST',
-			body: JSON.stringify({page, newAssets, deleteAssetsIDs}),
+			body: JSON.stringify({page}),
 			headers: {
 				'content-type': 'application/json',
 				...getAuth()
@@ -179,11 +180,11 @@ class EditorContextProvider extends Component {
 		toast[(res.success ? 'success':'error')](res.message)
 		page.content = content
 		// update assets
-		let assets = this.state.assets.filter(asset => !deleteAssetsIDs.includes(asset.id))
+		/* let assets = this.state.assets.filter(asset => !deleteAssetsIDs.includes(asset.id))
 		assets = [...assets, ...res.data.assets]
 		this.editor.AssetManager.clear()
-		this.editor.AssetManager.add(assets)
-		this.setState({ ...this.state, selected: page, assets, loading: false })
+		this.editor.AssetManager.add(assets) */
+		this.setState({ ...this.state, selected: page, loading: false })
 		document.title = page.title || page.name
 	}
 
@@ -251,6 +252,37 @@ class EditorContextProvider extends Component {
 		return res
 	}
 
+	createAsset = async (asset) => {
+		let req = await fetch(`/api/asset/`, {
+			headers: {
+				...getAuth(),
+				'content-type': 'application/json',
+			},
+			method: 'POST',
+			body: JSON.stringify({ pid: this.state.selected.id, asset })
+		})
+		let res = await req.json()
+		asset.attributes.id = res.data.id
+
+		let assets = this.editor.AssetManager.getAll().map(a => a.attributes)
+		this.setState({...this.state, assets})
+	}
+
+	deleteAsset = async (asset) => {
+		console.log(asset)
+		let req = await fetch(`/api/asset/`, {
+			headers: {
+				...getAuth(),
+				'content-type': 'application/json',
+			},
+			method: 'DELETE',
+			body: JSON.stringify({ aid: asset.attributes.id })
+		})
+		let res = await req.json()
+		let assets = this.editor.AssetManager.getAll().map(a => a.attributes)
+		this.setState({...this.state, assets})
+	}
+
 	loadEditor = (container) => {
 		this.editor = grapesjs.init({
 			container,
@@ -270,8 +302,9 @@ class EditorContextProvider extends Component {
 				upload: '/api/image/upload',
 				headers: getAuth(),
 				multiUpload: false,
+				dropzone: true,
 				// assets: this.state.assets,
-			
+				
 				// The name used in POST to pass uploaded files, default: `'files'`
 				uploadName: 'image',
 			}
@@ -279,6 +312,17 @@ class EditorContextProvider extends Component {
 		this.setState({...this.state, editor: this.editor})
 
 		let toastID = ''
+		this.editor.on('asset:add', (asset) => {
+			if(asset.attributes.id){
+				return
+			}
+			this.createAsset(asset)
+			
+		})
+		this.editor.on('asset:remove', (asset) => {
+			this.deleteAsset(asset)
+		})
+
 		this.editor.on('asset:upload:start', () => {
 			// console.log('starting upload')
 			toastID = toast.loading('Uploading image...')

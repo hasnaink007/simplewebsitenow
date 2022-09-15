@@ -2,7 +2,6 @@ const express = require("express");
 const Page = require("../db/models/page.model");
 const Project = require("../db/models/project.model");
 const Assets = require("../db/models/assets.model");
-const { Op } = require("sequelize");
 
 const fs = require('fs');
 const path = require('path');
@@ -26,7 +25,12 @@ pagesRoutes.route("/api/pages/:id").get( async (req, res) => {
 		attributes: ['id', 'name', 'title', 'description', 'type', 'headerScripts', 'projectID']
 	})
 
-	let assets = await Assets.findAll({where: {projectID: project.id}})
+	let assets = await Assets.findAll({
+		where: {
+			projectID: project.id
+		},
+		order: [['createdAt', 'DESC']],
+	})
 
 	let selected = await Page.findOne({where: { projectID: req.params.id, type: 'index' }})
 	if(!selected){
@@ -135,17 +139,6 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 				// page.name = req.body.name.replace(/\s/ig, '_').replace(/[^a-zA-Z0-9_]/ig, '').slice(0, 20) || page.name
 				await page.save()
 				page = await page.get()
-				
-				let assets = req.body.newAssets.map(asset => {
-					return ({
-						src: asset.src,
-						projectID: page.projectID
-					})
-				})
-				assets = await Assets.bulkCreate(assets, { individualHooks: true })
-				if( req.body.deleteAssetsIDs?.length > 0 ){
-					await Assets.destroy({where : { id: req.body.deleteAssetsIDs, projectID: page.projectID}})
-				}
 
 				// update the html file content
 				let content = `<!DOCTYPE html>
@@ -167,7 +160,7 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 					};
 				});
 
-				res.success('Page updated', {page, assets})
+				res.success('Page updated', {page})
 			}
 		}else{
 			res.error('Not Found', req.body)
