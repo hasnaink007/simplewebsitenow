@@ -9,6 +9,16 @@ const path = require('path');
 const pagesRoutes = express.Router();
 
 // Get all user pages
+pagesRoutes.route("/api/templates").get( async (req, res) => {
+	let pages = await Page.findAll({
+		where: {type: 'template'},
+		attributes: ['id', 'name', 'title', 'description', 'headerScripts', 'projectID']
+	})
+
+	res.success('All templates', pages)
+})
+
+// Get all pages of a project
 pagesRoutes.route("/api/pages/:id").get( async (req, res) => {
 	if(!req.user || !req.user.email || !req.user.id){
 		res.error('',[{}])
@@ -92,20 +102,32 @@ pagesRoutes.route("/api/page/save").post( async (req, res) => {
 			}
 		}else{
 			let project = await Project.findOne({where: {id: req.body.projectID, ownerID: req.user.id}})
-				
+			
 			if(!project){
-				res.error('Not Found', req.body)
+				res.error('Project Not Found', req.body)
 				return
 			}
 
-			let page = await Page.create({
-				title: req.body.title,//.replace(/[^a-zA-Z0-9_ \-\!\#\$\%\^\&\*]/ig, '').slice(0, 100) || 'New Page',
+			let template = {}
+			let newPage = {
+				title: req.body.title,
 				name: req.body.name.replace(/\s/ig, '_').replace(/[^a-zA-Z0-9_]/ig, '').slice(0, 50) || new Date().setMilliseconds(0),
 				content: req.body.content || '{}',
 				creatorID: req.user.id,
 				projectID: project.id
-			})
+			}
+
+			if(req.body.templateID && Number(req.body.templateID)){
+				let template = await Page.findOne({where: {type: 'template', id: Number(req.body.templateID)}})
+				if(template){
+					newPage.content = template.content
+				}
+			}
+
+
+			let page = await Page.create(newPage)
 			record = await page.save()
+			record = await record.get()
 			res.success('Page created', record)
 		}
 
@@ -175,18 +197,17 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 
 // Delete user page permanently
 pagesRoutes.route("/api/page/:id").delete( async (req, res) => {
-	if(!req.session || !req.session.user || !req.session.user.id){
-		res.json({res: 'error', text: 'Unauthorized!'})
+
+	let page = await Page.findOne({where: {id: req.params.id} })
+	let project = await Project.findOne({ where: { id: (page?.projectID || 0), ownerID: req.user.id } })
+	
+	if( !page || !project ){
+		res.error('Page not found')
 		return
 	}
-	let page = await Page.findOne({where: {id: req.params.id, owner: req.session.user.id} })
-	if( !page ){
-		res.json({res: 'error', text: 'Page not found'})
-		return
-	}
-	await Page.destroy({where: {parent: page.id}})
+	// await Page.destroy({where: {parent: page.id}})
 	await page.destroy()
-	res.json({res: 'success', text: 'Page deleted'})
+	res.success('Page deleted', {})
 
 })
 

@@ -45,9 +45,11 @@ class EditorContextProvider extends Component {
 			pid: Number(window.location.href.split('editor/')[1].split('/')[0]),
 			editor: this.editor,
 			
+			loadTemplates: this.loadTemplates,
 			loadPages: this.loadPages,
 			loadPage: this.loadPage,
 			savePage: this.savePage,
+			useTemplate: this.useTemplate,
 			updateContent: this.updateContent,
 			// renamePage: this.renamePage,
 			loadEditor: this.loadEditor,
@@ -67,6 +69,20 @@ class EditorContextProvider extends Component {
 		if( window.confirm('There were some error loading this page. Please refresh') ){
 			window.location.reload()
 		}
+	}
+
+	useTemplate = async template => {
+		let data = {}
+		data.description = template.description
+		data.headerScripts = template.headerScripts
+		data.name = template.name
+		data.title = template.title
+		data.templateID = template.id
+
+		let page = await this.savePage(data)
+
+		await this.loadPage(page)
+		return page
 	}
 
 	savePage = async (data) => {
@@ -135,8 +151,10 @@ class EditorContextProvider extends Component {
 
 		toast.update(toastID, {...toastOptions, type:'success', render: res.message})
 		this.setState({ ...this.state, selected, pages, loading: false })
-
-		document.title = res.data.title || res.data.name
+		if(data.pid){
+			document.title = res.data.title || res.data.name
+		}
+		return res.data
 	}
 	
 	updateContent = async () => {
@@ -152,16 +170,8 @@ class EditorContextProvider extends Component {
 		let content = this.editor.getProjectData()
 
 		// Manage assets
-		let deleteAssetsIDs = []
-		// let newAssets = content.assets.filter( asset => !asset.id )
-		let allAssetIDs = content.assets.map( asset => asset.id )
-		
-		/* this.state.assets.forEach(asset => {
-			if(!allAssetIDs.includes(asset.id)){
-				deleteAssetsIDs.push(asset.id)
-			}
-		}) */
-
+		// let deleteAssetsIDs = []
+		// let allAssetIDs = content.assets.map( asset => asset.id )
 
 		delete content.assets
 		page.content = JSON.stringify(content)
@@ -179,13 +189,16 @@ class EditorContextProvider extends Component {
 
 		toast[(res.success ? 'success':'error')](res.message)
 		page.content = content
-		// update assets
-		/* let assets = this.state.assets.filter(asset => !deleteAssetsIDs.includes(asset.id))
-		assets = [...assets, ...res.data.assets]
-		this.editor.AssetManager.clear()
-		this.editor.AssetManager.add(assets) */
+
 		this.setState({ ...this.state, selected: page, loading: false })
 		document.title = page.title || page.name
+	}
+
+	loadTemplates = async () => {
+
+		let req = await fetch(`/api/templates`, {headers: getAuth()})
+		let res = await req.json()
+		return res.data
 	}
 
 	loadPages = async () => {
@@ -389,18 +402,19 @@ class EditorContextProvider extends Component {
 
 
 
-	deletePage = async () => {
-		// Modifications required
-		/* let toastID = toast.loading('Deleting note...')
-		let req = await fetch(`/api/note/${this.state.page.id}`, {
+	deletePage = async (page) => {
+		
+		let toastID = toast.loading('Deleting page...')
+		let req = await fetch(`/api/page/${page.id}`, {
 			method: 'DELETE',
+			headers: getAuth()
 		})
 		let res = await req.json()
-		let page = this.state.pages.filter(n => n.id !== this.state.page.id)
-		let recyclebin = [...this.state.recyclebin, this.state.selectedNote]
-		this.setState({ ...this.state, Editor, recyclebin, selectedNote: {} })
-		window.history.pushState({}, '', `/dashboard/`)
-		toast.update(toastID, {...toastOptions, render: 'Moved to recycle bin', type: 'success' })*/
+
+		let pages = this.state.pages.filter(p => p.id !== page.id)
+		this.setState({ ...this.state,  pages})
+		let p = await this.loadPage(this.state.pages[0])
+		toast.update(toastID, {...toastOptions, render: res.message, type: res.success ? 'success' : 'error' })
 	}
 	
 

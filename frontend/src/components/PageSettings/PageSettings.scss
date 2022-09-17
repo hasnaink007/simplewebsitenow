@@ -4,6 +4,10 @@
 
 	z-index: 99;
 
+	h3{
+		color: #444;
+	}
+
 	&, .hiding_layout{
 		position: fixed;
 		display: flex;
@@ -34,7 +38,7 @@
 		padding: 15px;
 		overflow-y: auto;
 
-		h2{
+		h3{
 			color: #333;
 			margin: 0px 0px 10px;
 		}
@@ -61,6 +65,68 @@
 		.settings_popup_inner{
 			overflow: auto;
 			height: 100%;
+			color: #444;
+
+			.pagePreloader{
+				width: 100%;
+				height: 250px;
+			}
+
+
+			h4{
+				margin-top: 0px;
+				color: #444;
+			}
+			.page_settings{
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+
+				
+				&.page_tabs h4{
+					margin-top: 0px;
+					color: #444;
+					padding-bottom: 5px;
+					border-bottom: 3px solid #ddd;
+					cursor: pointer;
+
+					&.active{
+						border-bottom-color: $secondary-light;
+					}
+					&:hover{
+						border-bottom-color: $secondary-light;
+					}
+				}
+			}
+
+			.available_templates{
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				grid-gap: 15px;
+				padding: 10px 5px;
+
+				.template_card{
+					padding: 10px;
+					box-shadow: 0px 0px 5px 0px $secondary-light;
+					border-radius: 7px;
+					display: flex;
+					justify-content: space-between;
+
+					button{
+						padding: 0;
+						background-color: transparent;
+
+						svg{
+							color: $secondary-light;
+							width: 20px;
+							height: 20px;
+							
+							&:hover{
+								color: $secondary;
+							}
+						}
+					}
+				}
+			}
 
 			.pageinfo_form{
 				display: grid;
@@ -108,49 +174,26 @@
 					&:hover{
 						background: $secondary;
 					}
-				}
-			}
 
-			.recycle_bin{
-				color: #333;
-				overflow: auto;
-				max-height: 250px;
-				padding-right: 5px;
-
-				.no_note_in_recyclebin{
-					text-align: center;;
+					&.delete_button{
+						background-color: red;
+						
+						&:hover{
+							background-color: rgb(188, 0, 0);
+						}
+					}
 				}
-
-				&::-webkit-scrollbar {
-					width: 5px;
-				}
-				&::-webkit-scrollbar-track {
-					background: #ccc;
-				}
-				&::-webkit-scrollbar-thumb {
-					background: #ffb500;
-				}
-				&::-webkit-scrollbar-thumb:hover{
-					background: $primary;
-				}
-
-				.deleted_note{
-					padding: 10px;
-					border-bottom: 1px solid #ccc; 
-					cursor: pointer;
+				.page_form_btns{
 					display: flex;
-					justify-content: space-between;
-					gap: 10px;
-					svg{
-						height: 20px;
-						width: 20px;
-					}
-
-					&:hover{
-						background: #efefef;
+					justify-content: right;
+					
+					button{
+						display: inline-block;
+						margin-left: 20px;
 					}
 				}
 			}
+
 		}
 
 
