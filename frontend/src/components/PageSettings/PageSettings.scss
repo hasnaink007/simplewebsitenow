@@ -110,6 +110,11 @@
 					border-radius: 7px;
 					display: flex;
 					justify-content: space-between;
+					grid-gap: 15px;
+
+					&>div{
+						min-width: 50px;
+					}
 
 					button{
 						padding: 0;
@@ -186,7 +191,7 @@
 				.page_form_btns{
 					display: flex;
 					justify-content: right;
-					
+
 					button{
 						display: inline-block;
 						margin-left: 20px;
