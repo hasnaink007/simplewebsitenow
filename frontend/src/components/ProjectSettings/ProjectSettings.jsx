@@ -16,20 +16,23 @@ export default class ProjectSettings extends Component {
 		this.state = {
 			isSubDomain: this.props.project.id ? this.props.project.isSubDomain : true,
 			domainName: this.props.project.domainName,
-			domainState: (this.props.project.domainName == '' ? 'check_availablity' : 'selected'),
+			domainState: (!this.props.project.domainName ? 'check_availability' : 'selected'),
 			message: <></>,
 			searching: false
 		}
 	}
 
-	handleSubmit = e => {
+	handleSubmit = async e => {
 		e.preventDefault()
 		// console.log(e)
 		let data = { name: '', description: '', domainName: '', indexPage: 0 }
 		Object.keys(data).forEach(key => {
 			data[key] = e.target[key].value
 		})
-		this.context.updateSettings(this.props.project.id, data)
+		let update = await this.context.updateSettings(this.props.project.id, data)
+		if(update){
+			this.props.hide()
+		}
 	}
 
 	searchDomain = async (e) => {
@@ -84,10 +87,19 @@ export default class ProjectSettings extends Component {
 		return domainState
 	}
 
+	componentDidMount(){
+
+		if(!this.props.project.id && this.context.templates.length < 1){
+			this.context.loadSelectableTemplates()
+		}
+	}
+
 	render() {
 
 		let index = this.props.project.pages.find(p => {return p.type=='index'})
 		let domainState = this.state.domainState
+
+		let pages = this.props.project.id ? this.props.project.pages : this.context.templates;
 
 
 		return (
@@ -136,10 +148,14 @@ export default class ProjectSettings extends Component {
 							{this.state.message}
 
 							<label>
-								<span>Index Page</span>
-								<select name="indexPage" defaultValue={index?.id} disabled={index?.id ? false : true}>
-									{this.props.project.pages.map(p => <option value={p?.id} key={p?.id}>{p?.name}</option>)}
-									{(!index?.id) && <option value={0}>index</option>}
+								{this.props.project.id && <span>Index Page</span>}
+								{!this.props.project.id &&
+								<div style={{display: 'flex', justifyContent: 'space-between'}}>
+									<span>Select homepage template</span>
+									<a href="http://templates.simplewebsitenow.com/" target="_blank"><small>View all templates</small></a>
+								</div>}
+								<select name="indexPage" defaultValue={index?.id}>
+									{pages.map(p => <option value={p?.id} key={p?.id}>{p?.name}</option>)}
 								</select>
 							</label>
 							<div></div>

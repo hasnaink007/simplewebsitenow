@@ -14,11 +14,13 @@ class ProjectContextProvider extends Component {
 			saving: false,
 			projects: [],
 			filter: '',
+			templates: [],
 			
 			loadProjects: this.loadProjects,
 			updateSettings: this.updateSettings,
 			cloneProject: this.cloneProject,
 			deleteProject: this.deleteProject,
+			loadSelectableTemplates: this.loadSelectableTemplates,
 			chackDomainAvailability: this.chackDomainAvailability,
 			saveProject: this.saveProject,
 			createProject: this.createProject,
@@ -48,6 +50,13 @@ class ProjectContextProvider extends Component {
 		this.setState({ ...this.state, projects, loading: false })
 	}
 
+	loadSelectableTemplates = async () => {
+
+		let req = await fetch(`/api/templates`, {headers: getAuth()})
+		let res = await req.json()
+		this.setState({...this.state, templates: res.data})
+	}
+
 	updateSettings = async (pid, data) => {
 
 		this.setState({ ...this.state, loading: true })
@@ -62,7 +71,7 @@ class ProjectContextProvider extends Component {
 		let res = await req.json()
 		if(!res.success){
 			toast.error(res.message)
-			return
+			return false
 		}
 		let projects = this.state.projects
 		if( pid ){
@@ -81,6 +90,7 @@ class ProjectContextProvider extends Component {
 
 		this.setState({...this.state, projects})
 		toast.success(res.message)
+		return true
 	}
 	
 	cloneProject = async (data) => {

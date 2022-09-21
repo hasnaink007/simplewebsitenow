@@ -185,6 +185,11 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 				return
 			}
 		}else{
+
+			console.log(req.body)
+			// res.success('Settings Updated', {name: 'test', description: 'test', id: 1, domainName: 'test'})
+
+			// return
 			let project = await Project.create({
 				name: req.body.name,
 				description: req.body.description,
@@ -201,14 +206,17 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 			if (!fs.existsSync(dir)) {
 				fs.mkdirSync(dir);
 			} */
+			let template = await Page.findOne({where: {type: 'template', id: req.body.indexPage }})
+			template = template?.id ? template : {};
+
 
 			let page = await Page.create({
-				name: 'index',
+				name: template.name || 'index',
 				type: 'index',
-				description: 'Default index page when project was created',
+				description: template.description || 'Default index page when project was created',
 				creatorID: req.user.id,
 				projectID: record.id,
-				content: '{}'
+				content: template.content || '{}'
 			})
 			await page.save()
 		}
