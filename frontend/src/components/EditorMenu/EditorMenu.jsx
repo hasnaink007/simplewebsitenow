@@ -49,7 +49,7 @@ class EditorMenu extends Component {
 
 				{this.state.settings}
 				<div className="selected_page" onClick={e => this.setState({...this.state, showAll: !this.state.showAll})}>
-					{this.context?.selected?.name?.slice(0,30)} <IoMdArrowDropdown />
+					{this.context?.selected?.name?.slice(0,23)} <IoMdArrowDropdown />
 				</div>
 				<span className="gjs-pn-btn fa fa-save hks_save_btn" data-tooltip="Save" data-tooltip-pos="bottom" onClick={this.context.updateContent}></span>
 				<span className="gjs-pn-btn fa fa-external-link  hks_preview_btn" data-tooltip="Preview" data-tooltip-pos="bottom" onClick={this.previewPage}></span>
