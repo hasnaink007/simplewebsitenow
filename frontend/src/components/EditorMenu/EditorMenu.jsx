@@ -56,8 +56,9 @@ class EditorMenu extends Component {
 				{/* <span className="gjs-pn-btn hks_save_btn" data-tooltip="Rename page" data-tooltip-pos="bottom" onClick={this.context.renamePage}>
 					<BiRename/>
 				</span> */}
-				<div className="all_pages">
-					{this.state.showAll && <>
+				{this.state.showAll && <>
+					<div id="pages_hider" onClick={e => this.setState({...this.state, showAll: !this.state.showAll})}></div>
+					<div className="all_pages">
 						{this.context.pages.map((page) => {
 							return(
 								<div className={`page_entry ${page.id==this.context.selected.id ? 'selected_page':''}`} key={page.id} onClick={e => this.changePage(page, e)}>
@@ -69,8 +70,8 @@ class EditorMenu extends Component {
 						<div className='page_entry' onClick={e => this.showSettings({})}>
 							<strong>Add new page</strong>
 						</div>
-					</>}
-				</div>
+					</div>
+				</>}
 			</div>
 		);
 	}

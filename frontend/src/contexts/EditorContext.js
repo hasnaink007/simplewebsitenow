@@ -301,26 +301,27 @@ class EditorContextProvider extends Component {
 			container,
 			components: '<div class="txt-red">Hello world!</div>',
 			style: '.txt-red{color: red}',
-			plugins: [gsCustom, gsTab, gsWebpage, gsTUI, gsBackground, gsFilter, gsGradient, gsFlexbox, gsSlider, gsTooltip],
+			plugins: [gsWebpage, gsTUI, gsBackground, gsFilter, gsGradient, gsFlexbox, gsTooltip, gsCustom, gsTab, gsSlider],
 			// pluginsOpts: {
 			// 	'grapesjs-plugin-export': { }
 			// },
-			showOffsets: 1,
+			// showOffsets: 1,
 			noticeOnUnload: 0,
 			height: '100vh',
 			fromElement: true,
 			storageManager: { autoload: 0 },
 			assetManager: {
-				// Upload endpoint, set `false` to disable upload, default `false`
 				upload: '/api/image/upload',
 				headers: getAuth(),
 				multiUpload: false,
 				dropzone: true,
-				// assets: this.state.assets,
-				
-				// The name used in POST to pass uploaded files, default: `'files'`
 				uploadName: 'image',
-			}
+			},
+			canvasCss: `
+				.gjs-selected {
+					outline: 3px solid #F0803C60 !important;
+				}
+			`,
 		});
 		this.setState({...this.state, editor: this.editor})
 
@@ -361,21 +362,43 @@ class EditorContextProvider extends Component {
 		this.editor.on('run', (commandId) => {
 			// console.log('Run', commandId);
 			switch(commandId){
-				case 'preview': this.setState({...this.state, customMenu: false})
+				case 'preview': this.setState({...this.state, customMenu: false}); break;
+				// Hide duplicates in style manager gjs-sm-sector
+				case 'open-sm': hideDuplicates(); break;
+				
 			}
-		  });
+		});
 		  
 		this.editor.on('stop', commandId => {
 			// console.log('Stop', commandId);
-
+			
 			switch(commandId){
 				case 'preview': this.setState({...this.state, customMenu: true})
 			}
-		  });
+		});
+
 
 		var pn = this.editor.Panels;
 		/* var modal = this.editor.Modal;
 		var cmdm = this.editor.Commands; */
+		
+		// Remove duplicates from the Style Manager Panel
+		let hideDuplicates = () => {
+			let sm_panel_btns = document.querySelectorAll('.gjs-sm-sector')
+			let options = []
+			// console.log(sm_panel)
+			sm_panel_btns.forEach(btn => {
+				let text = btn.querySelector('.gjs-sm-sector-title .gjs-sm-sector-label')?.innerText
+				if( !btn.classList.contains('hidden') && options.includes(text) ){
+					btn.classList.add('hidden')
+					// console.log('hiding '+text)
+				}else{
+					options.push(text)
+				}
+			})
+
+		}
+
 
 		// Add and beautify tooltips
 		menuBtns.forEach(function(item) {
