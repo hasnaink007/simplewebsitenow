@@ -92,7 +92,7 @@ class EditorComponent extends Component {
 					{this.state.popup}
 					
 					<div className="dashboard_header">
-						<h1>Projects <small>({this.context.projects.length})</small></h1>
+						<h2>Projects <small>({this.context.projects.length})</small></h2>
 						<button onClick={e => this.settings({pages: []})}>Add Project</button>
 					</div>
 					
