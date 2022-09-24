@@ -31,20 +31,21 @@
 		width: 100%;
 		border: 1px solid #999;
 		padding: 5px;
-		border-radius: 5px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		cursor: pointer;
 	}
-
+	
 	.all_pages{
+		background: #30308d;
+		max-width: 300px;
 		position: absolute;
 		top: 35px;
-		background: #30308d;
 		width: 100%;
-		max-width: 210px;
-
+		max-height: calc(100vh - 100px);
+		overflow: auto;
+		
 		.page_entry{
 			cursor: pointer;
 			display: block;
@@ -53,17 +54,10 @@
 			border-bottom: 1px solid #888;
 			line-break: anywhere;
 			position: relative;
+			padding-right: 30px;
 
-			&.selected_page:before{
-				content: '';
-				position: absolute;
-				display: block;
-				width: 5px;
-				height: 5px;
-				background: $secondary-light;
-				border-radius: 100px;
-				top: 14px;
-				left: 3px;
+			&.selected_page{
+				background-color: #9d542766;
 			}
 
 			.edit_page{
