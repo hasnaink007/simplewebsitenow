@@ -37,15 +37,15 @@
         right: 0;
     }
     .gjs-one-bg{
-        background-color: #031b4d;
+        background-color: $primary;
     }
     .gjs-three-bg{
-        background-color: #9d542780;
+        background-color: $primary-light;
     }
 
     .gjs-four-color{
         color: #109DF7;
-        background-color: #F0803C60;
+        background-color: $primary-light;
     }
 
     .gjs-pn-options{
@@ -64,7 +64,7 @@
     .gjs-block-categories{
         .gjs-title{
             font-size: 18px;
-            background: #9d542780;
+            background: $primary-light;
         }
     }
     .gjs-blocks-c{
@@ -116,19 +116,19 @@
         transition: .3s;
 
         &:hover{
-            background-color: #F0803C60;
+            background-color: $primary-light;
         }
     }
     .gjs-sm-sector-title{
         font-size: 18px;
         padding-left: 5px;
         padding-right: 5px;
-        background: #9d542780;
+        background: $primary-light;
     }
 
     .gjs-pn-btn:hover, .gjs-four-color-h:hover{
         color: #109DF7;
-        background-color: #F0803C60;
+        background-color: $primary-light;
     }
     .gjs-toolbar{
         background-color: #F0803C80;

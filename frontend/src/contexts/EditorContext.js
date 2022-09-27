@@ -306,6 +306,9 @@ class EditorContextProvider extends Component {
 			// 	'grapesjs-plugin-export': { }
 			// },
 			// showOffsets: 1,
+			canvas: {
+                styles: ['https://fonts.googleapis.com/css2?family=Aclonica&family=Aguafina+Script&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Montserrat:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Nunito:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Oswald:wght@300;400;700&family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Raleway:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Whisper&display=swap'],
+            },
 			noticeOnUnload: 0,
 			height: '100vh',
 			fromElement: true,
@@ -377,10 +380,43 @@ class EditorContextProvider extends Component {
 			}
 		});
 
+		this.editor.on('load', () => {
+			console.log(this.editor, this.state.editor)
+			let styleManager = this.editor.StyleManager;
+			let fontProperty = styleManager.getProperty('typography', 'font-family');
+			var list = [];
+			fontProperty.set('list', list);
+			
+			// let fonts = ["Nunito","Roboto","Poppins","Montserrat","Oswald","Raleway","Whisper","Aclonica","Aguafina Script", "Lato"]
+			
+			list = [
+				fontProperty.addOption({value: "sans-serif", name: 'sans-serif'}),
+				fontProperty.addOption({value: "'Open Sans', sans-serif", name: 'Open Sans'}),
+				
+				
+				
+				fontProperty.addOption({value: "'Montserrat', sans-serif", name: 'Montserrat'}),
+				fontProperty.addOption({value: "'Oswald', sans-serif", name: 'Oswald'}),
+				fontProperty.addOption({value: "'Lato', sans-serif", name: 'Lato'}),
+				fontProperty.addOption({value: "'Nunito', sans-serif", name: 'Nunito'}),
+				fontProperty.addOption({value: "'Roboto', sans-serif", name: 'Roboto'}),
+				fontProperty.addOption({value: "'Poppins', sans-serif", name: 'Poppins'}),
+				fontProperty.addOption({value: "'Raleway', sans-serif", name: 'Raleway'}),
+				fontProperty.addOption({value: "'Whisper', sans-serif", name: 'Whisper'}),
+				fontProperty.addOption({value: "'Aclonica', sans-serif", name: 'Aclonica'}),
+				fontProperty.addOption({value: "'Aguafina Script', sans-serif", name: 'Aguafina Script'}),
+				
+
+			];
+			fontProperty.set('list', list);
+			styleManager.render();
+		});
+
 
 		var pn = this.editor.Panels;
 		/* var modal = this.editor.Modal;
 		var cmdm = this.editor.Commands; */
+
 		
 		// Remove duplicates from the Style Manager Panel
 		let hideDuplicates = () => {
