@@ -169,6 +169,9 @@ pagesRoutes.route("/api/page/update").post( async (req, res) => {
 						<script id="title_script"> document.title = ${JSON.stringify(page.title)}; document.getElementById('title_script').remove();</script>
 						${page.headerScripts || ''}
 						<style>${req.body.page.css}</style>
+						<style>
+							@import url('https://fonts.googleapis.com/css2?family=Aclonica&family=Aguafina+Script&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Montserrat:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Nunito:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Oswald:wght@300;400;700&family=Poppins:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Raleway:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Whisper&display=swap');
+						</style>
 					</head>
 					${req.body.page.html}
 					<script>${req.body.page.js}</script>
