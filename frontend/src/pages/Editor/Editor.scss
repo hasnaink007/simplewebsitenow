@@ -49,8 +49,15 @@
     }
 
     .gjs-pn-options{
-        left: calc(15% + 270px);
+        left: calc(50% - 52px);
         right: auto;
+        
+        &>div{
+            flex-direction: row-reverse;
+        }
+    }
+    
+    .gjs-pn-devices-c{
         
         &>div{
             flex-direction: row-reverse;

@@ -22,13 +22,6 @@ import gsTooltip from 'grapesjs-tooltip';
 
 const EditorContext = React.createContext();
 
-
-const menuBtns = [
-	['sw-visibility', 'Show Borders'], ['preview', 'Preview'], ['fullscreen', 'Fullscreen'],
-	['export-template', 'Export'], ['undo', 'Undo'], ['redo', 'Redo'],
-	['gjs-open-import-webpage', 'Import'], ['canvas-clear', 'Clear canvas']
-];
-
 class EditorContextProvider extends Component {
 	constructor(props) {
 		super(props);
@@ -381,20 +374,15 @@ class EditorContextProvider extends Component {
 		});
 
 		this.editor.on('load', () => {
-			console.log(this.editor, this.state.editor)
 			let styleManager = this.editor.StyleManager;
 			let fontProperty = styleManager.getProperty('typography', 'font-family');
 			var list = [];
 			fontProperty.set('list', list);
-			
 			// let fonts = ["Nunito","Roboto","Poppins","Montserrat","Oswald","Raleway","Whisper","Aclonica","Aguafina Script", "Lato"]
-			
 			list = [
 				fontProperty.addOption({value: "sans-serif", name: 'sans-serif'}),
 				fontProperty.addOption({value: "'Open Sans', sans-serif", name: 'Open Sans'}),
-				
-				
-				
+
 				fontProperty.addOption({value: "'Montserrat', sans-serif", name: 'Montserrat'}),
 				fontProperty.addOption({value: "'Oswald', sans-serif", name: 'Oswald'}),
 				fontProperty.addOption({value: "'Lato', sans-serif", name: 'Lato'}),
@@ -405,8 +393,6 @@ class EditorContextProvider extends Component {
 				fontProperty.addOption({value: "'Whisper', sans-serif", name: 'Whisper'}),
 				fontProperty.addOption({value: "'Aclonica', sans-serif", name: 'Aclonica'}),
 				fontProperty.addOption({value: "'Aguafina Script', sans-serif", name: 'Aguafina Script'}),
-				
-
 			];
 			fontProperty.set('list', list);
 			styleManager.render();
@@ -433,27 +419,85 @@ class EditorContextProvider extends Component {
 				}
 			})
 
+			pn.removeButton('options', 'sw-visibility')
+			pn.removeButton('options', 'undo')
+			pn.removeButton('options', 'redo')
+			pn.removeButton('options', 'gjs-open-import-webpage')
+			pn.removeButton('options', 'canvas-clear')
+
 		}
+
+		// Add options buttons from panel [for changing position and icons]
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn dripicons-article',
+			id: 'border_elements',
+			command: 'sw-visibility',
+			attributes: { 'data-tooltip': "Bordered Components", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn icon dripicons-media-shuffle',
+			id: 'redo',
+			command: 'core:redo',
+			attributes: { 'data-tooltip': "Redo", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn icon dripicons-time-reverse',
+			id: 'undo',
+			command: 'core:undo',
+			attributes: { 'data-tooltip': "Undo", 'data-tooltip-pos': "bottom"},
+			active: false,
+		})
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn dripicons-browser-upload',
+			id: 'import',
+			command: 'gjs-open-import-webpage',
+			attributes: { 'data-tooltip': "Import", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn fa fa-eraser ',
+			id: 'clear_all',
+			command: 'canvas-clear',
+			attributes: { 'data-tooltip': "Clear All", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn fa fa-save hks_save_btn',
+			id: 'save_page',
+			command: this.updateContent,
+			attributes: { 'data-tooltip': "Save", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+		pn.addButton('devices-c', {
+			className: 'gjs-pn-btn fa fa-external-link  hks_preview_btn',
+			id: 'preview_external',
+			command: (e)=>{ window.open( `http://${this.project.isSubDomain ? this.project.domainName+'.simplewebsitenow.com' : this.project.domainName }/${this.selected.name}.html` ) },
+			attributes: { 'data-tooltip': "Preview", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
+		pn.addButton('options', {
+			className: 'gjs-pn-btn dripicons-home hks_home_btn',
+			id: 'go_home',
+			command: (e)=>{ window.location.href = window.location.origin + '/dashboard' },
+			attributes: { 'data-tooltip': "Home", 'data-tooltip-pos': "bottom" },
+			active: false,
+		})
 
 
 		// Add and beautify tooltips
-		menuBtns.forEach(function(item) {
-			pn.getButton('options', item[0]).set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
-		});
-		[['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks']]
-		.forEach(function(item) {
-			pn.getButton('views', item[0]).set('attributes', {title: item[1], 'data-tooltip-pos': 'bottom'});
-		});
-		var titles = document.querySelectorAll('*[title]');
+		let titles = {
+			'options': [['preview', 'Preview'], ['fullscreen', 'Fullscreen'], ['export-template', 'Export Code']],
+			'views': [['open-sm', 'Style Manager'], ['open-layers', 'Layers'], ['open-blocks', 'Blocks']],
+			'devices-c': [['set-device-desktop', 'Desktop View'], ['set-device-tablet', 'Tablet View'], ['set-device-mobile', 'Mobile View']]
+		}
 
-		for (var i = 0; i < titles.length; i++) {
-			var el = titles[i];
-			var title = el.getAttribute('title');
-			title = title ? title.trim(): '';
-			if(!title)
-			break;
-			el.setAttribute('data-tooltip', title);
-			el.setAttribute('title', '');
+		for(let key in titles){
+			titles[key].forEach(function(item) {
+				pn.getButton(key, item[0]).set('attributes', {title: item[1], 'data-tooltip': item[1], 'data-tooltip-pos': 'bottom'});
+			});
 		}
 
 		window.editor = this.editor

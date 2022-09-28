@@ -37,10 +37,6 @@ class EditorMenu extends Component {
 		}
 	}
 
-	previewPage = () => {
-		window.open( `http://${this.context.project.isSubDomain ? this.context.project.domainName+'.simplewebsitenow.com' : this.context.project.domainName }/${this.context.selected.name}.html` )
-	}
-
 	render() {
 
 		// console.log(this.state.settings)
@@ -51,11 +47,6 @@ class EditorMenu extends Component {
 				<div className="selected_page" onClick={e => this.setState({...this.state, showAll: !this.state.showAll})}>
 					{this.context?.selected?.name?.slice(0,23)} <IoMdArrowDropdown />
 				</div>
-				<span className="gjs-pn-btn fa fa-save hks_save_btn" data-tooltip="Save" data-tooltip-pos="bottom" onClick={this.context.updateContent}></span>
-				<span className="gjs-pn-btn fa fa-external-link  hks_preview_btn" data-tooltip="Preview" data-tooltip-pos="bottom" onClick={this.previewPage}></span>
-				{/* <span className="gjs-pn-btn hks_save_btn" data-tooltip="Rename page" data-tooltip-pos="bottom" onClick={this.context.renamePage}>
-					<BiRename/>
-				</span> */}
 				{this.state.showAll && <>
 					<div id="pages_hider" onClick={e => this.setState({...this.state, showAll: !this.state.showAll})}></div>
 					<div className="all_pages">
