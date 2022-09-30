@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.29c7481b.css",
-    "main.js": "/static/js/main.31e8ca70.js",
+    "main.js": "/static/js/main.6b513399.js",
     "static/media/main-fonts.svg?v=20": "/static/media/main-fonts.404be73e1ad40b1da282.svg",
     "static/media/Courier-Regular.woff2": "/static/media/Courier-Regular.d4817a2ea02ce52cf6b2.woff2",
     "static/media/Courier-Thin.woff2": "/static/media/Courier-Thin.c88b50bc452ac3b094e5.woff2",
@@ -13,10 +13,10 @@
     "static/media/main-fonts.woff?v=20": "/static/media/main-fonts.dbf9ed7d53cfa8f73da7.woff",
     "index.html": "/index.html",
     "main.29c7481b.css.map": "/static/css/main.29c7481b.css.map",
-    "main.31e8ca70.js.map": "/static/js/main.31e8ca70.js.map"
+    "main.6b513399.js.map": "/static/js/main.6b513399.js.map"
   },
   "entrypoints": [
     "static/css/main.29c7481b.css",
-    "static/js/main.31e8ca70.js"
+    "static/js/main.6b513399.js"
   ]
 }

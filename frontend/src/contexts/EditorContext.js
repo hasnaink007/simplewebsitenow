@@ -474,7 +474,7 @@ class EditorContextProvider extends Component {
 		pn.addButton('devices-c', {
 			className: 'gjs-pn-btn fa fa-external-link  hks_preview_btn',
 			id: 'preview_external',
-			command: (e)=>{ window.open( `http://${this.project.isSubDomain ? this.project.domainName+'.simplewebsitenow.com' : this.project.domainName }/${this.selected.name}.html` ) },
+			command: (e)=>{ window.open( `http://${this.state.project.isSubDomain ? this.state.project.domainName+'.simplewebsitenow.com' : this.state.project.domainName }/${this.state.selected.name}.html` ) },
 			attributes: { 'data-tooltip': "Preview", 'data-tooltip-pos': "bottom" },
 			active: false,
 		})
