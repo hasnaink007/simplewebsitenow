@@ -36,14 +36,14 @@ const uploadToBucket = multer({
     bucket: 'devonian-apps',
     acl: 'public-read',
     metadata: function (req, file, cb) {
-      console.log('metadat >>>>>>>>>>>>>>\n', file)
+      // console.log('metadat >>>>>>>>>>>>>>\n', file)
       cb(null, {fieldName: file.fieldname});
     },
     key: function (req, file, cb) {
       // use file extension from the file mimetype
 
       // console.log(file)
-      cb(null, `simplewebsitenow/${Date.now().toString()  }.${  file.mimetype.split('/')[1]}`)
+      cb(null, `simplewebsitenow/${Date.now().toString()  }.${  file.mimetype.split('/')[1].split('+')[0]}`)
     }
   }),
     limits: { fileSize: 1024 * 1024 * 5 }, // 5MB
@@ -52,7 +52,7 @@ const uploadToBucket = multer({
     fileFilter: function(req, file, cb) {
         const filetypes = /jpeg|jpg|png|svg/;
         const mimetype = filetypes.test(file.mimetype);
-        console.log({mimetype})
+        console.log({uploadedFileMimeType: mimetype})
         if (mimetype) {
             return cb(null, true);
         } else {
