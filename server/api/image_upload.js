@@ -52,6 +52,7 @@ const uploadToBucket = multer({
     fileFilter: function(req, file, cb) {
         const filetypes = /jpeg|jpg|png|svg/;
         const mimetype = filetypes.test(file.mimetype);
+        console.log({mimetype})
         if (mimetype) {
             return cb(null, true);
         } else {
