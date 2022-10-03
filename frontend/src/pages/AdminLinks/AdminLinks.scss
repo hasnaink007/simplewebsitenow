@@ -1,0 +1,64 @@
+@import "utils/theme.scss";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300&display=swap');
+
+.admin_links_container{
+  background-color: black;
+}
+.admin_links {
+  width: 95vw;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #fff;
+  margin: auto;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+
+  .coupon_links_btns{
+    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    button{
+      max-width: 200px;
+    }
+  }
+
+  .coupon_link{
+    display: grid;
+    grid-gap: 15px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 5px;
+    grid-template-columns: 3fr 1fr 1fr;
+    text-align: left;
+    line-break: anywhere;
+  }
+  
+  .heading {
+    margin-bottom: 10px;
+  }
+  
+  .text {
+    font-size: 25px;
+  }
+  
+  .back_home {
+    width: 80%;
+    background-color: transparent;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    font-size: 25px;
+    color: #fff;
+    font-weight: lighter;
+    padding: 7px 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+    letter-spacing: 2px;
+    text-decoration: none;
+  }
+}
+
+

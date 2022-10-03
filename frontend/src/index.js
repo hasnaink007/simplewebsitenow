@@ -21,6 +21,7 @@ import Editor from 'pages/Editor/Editor';
 import NotFound from 'pages/NotFound/NotFound';
 import About from './pages/About/About';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
+import AdminLinks from './pages/AdminLinks/AdminLinks';
 
 ReactDOM.render(
 	<Router>
@@ -44,6 +45,11 @@ ReactDOM.render(
 							<ProjectContextProvider>
 								<Dashboard />
 							</ProjectContextProvider>
+						</AuthenticatedAccess>
+					} />
+					<Route exact path="/admin_links" element={
+						<AuthenticatedAccess>
+							<AdminLinks />
 						</AuthenticatedAccess>
 					} />
 					{<Route exact path="/editor/:id" element={
