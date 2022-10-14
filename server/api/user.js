@@ -27,8 +27,8 @@ userRoutes.route("/api/users/current").post(async(req, res) => {
     }
 
 	if( decoded ){
-		let  {name, email, username} = decoded
-		res.success('', { user: {name, email, username } })
+		let  {name, email, username, isVIP} = decoded
+		res.success('', { user: {name, email, username, isVIP } })
 	}else{
 		res.error('', { loggedIn: false })
 	}
@@ -129,8 +129,8 @@ userRoutes.route("/api/users/login").post( async (req, res) => {
 	let token = JWT.sign(userData, process.env.JWT_SECRET, { expiresIn: 60 * 60 * 24 })
 
 	if(bcrypt.compareSync(password, userData.password, 12) ){
-		let {name, username, email} = userData
-		res.success(`Welcome Back! ${name}`, {user: {name, username, email, token}})
+		let {name, username, email, isVIP} = userData
+		res.success(`Welcome Back! ${name}`, {user: {name, username, email, isVIP, token}})
 	}else{
 		res.error(`Incorrect Username or Password.`)
 	}

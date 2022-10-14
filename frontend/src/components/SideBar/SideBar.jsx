@@ -1,5 +1,7 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
+import ProjectSettings from 'components/ProjectSettings/ProjectSettings';
+
 
 import logo from 'assets/logo.png';
 
@@ -14,10 +16,7 @@ class SideBar extends Component {
 	constructor(props){
 		super(props)
 		this.state = {
-			filterNotes: '',
-			collapsed: false,
-			noteBeingDragged: {},
-			noteBeingDraggedOver: {}
+			popup: <></>
 		}
 	}
 
@@ -25,10 +24,20 @@ class SideBar extends Component {
 		// if anything to do?
 	}
 
+	hidePopup = e => {
+		this.setState({...this.state, popup: <></>})
+	}
+
+	addProject = e => {
+		e.preventDefault()
+		this.setState({...this.state, popup: <ProjectSettings hide={this.hidePopup} project={{pages: []}} />})    
+	}
+
 	render() {
 
 		return (
 			<>
+				{this.state.popup}
 				<div className="sidebar_container">
 					<div className="sidebar_content">
 						<div className="logo_container">
@@ -36,13 +45,13 @@ class SideBar extends Component {
 						</div>
 						<nav className="sidebar_nav">
 							<div className="sidebar_pages_links">
-								
 
 
 
+							<Link to='#' onClick={this.addProject}>Add Project</Link>
 							<Link to={`/dashboard`} className={window.location.pathname.split('/')[1]=='dashboard'?'active':'' }>Projects</Link>
-							<Link to={`/dashboard`} >Payments</Link>
-							<Link to={`/dashboard`} >Settings</Link>
+							{/* <Link to={`/dashboard`} >Payments</Link> */}
+							<Link to={`/settings`} className={window.location.pathname.split('/')[1]=='settings'?'active':''} >Settings</Link>
 							<Link to={`/dashboard`} onClick={this.props.userContext.logUserOut}> Logout</Link>
 
 

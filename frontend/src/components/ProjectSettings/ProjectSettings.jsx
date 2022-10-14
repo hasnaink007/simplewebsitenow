@@ -99,9 +99,10 @@ export default class ProjectSettings extends Component {
 		let index = this.props.project.pages.find(p => {return p.type=='index'})
 		let domainState = this.state.domainState
 
-		let pages = this.props.project.id ? this.props.project.pages : this.context.templates;
+		let pages = this.props.project.id ? this.props.project.pages : this?.context?.templates;
 
 
+		console.log(this.context)
 		return (
 			<div id="settings-popup-container-main">
 				<div className="hiding_layout" onClick={this.props.hide}></div>
@@ -155,7 +156,7 @@ export default class ProjectSettings extends Component {
 									<a href="http://templates.simplewebsitenow.com/" target="_blank"><small>View all templates</small></a>
 								</div>}
 								<select name="indexPage" defaultValue={index?.id}>
-									{pages.map(p => <option value={p?.id} key={p?.id}>{p?.name}</option>)}
+									{pages?.map(p => <option value={p?.id} key={p?.id}>{p?.name}</option>)}
 								</select>
 							</label>
 							<div></div>

@@ -39,7 +39,7 @@ const createProjectRootDir = (project) => {
 		fs.mkdirSync(dir);
 	}
 
-	let nginxFile = `server {
+	/* let nginxFile = `server {
 		listen 80;
 		listen [::]:80;
  
@@ -51,7 +51,34 @@ const createProjectRootDir = (project) => {
 		location / {
 				try_files $uri $uri/ =404;
 		}
- 	}`
+ 	}` */
+
+	let nginxFile = `server {
+		listen 80;
+		listen [::]:80;
+ 
+		server_name ${project.domainName}.simplewebsitenow.com www.${project.domainName}.simplewebsitenow.com;
+		return 301 https://$host$request_uri;
+		root ${dir};
+		index index.html;
+ 
+		location / {
+				try_files $uri $uri/ =404;
+		}
+ 	}
+	server {
+		listen 443 ssl;
+		server_name ${project.domainName}.simplewebsitenow.com www.${project.domainName}.simplewebsitenow.com;
+		ssl_certificate /etc/letsencrypt/live/simplewebsitenow.com-0001/fullchain.pem;
+		ssl_certificate_key /etc/letsencrypt/live/simplewebsitenow.com-0001/privkey.pem;
+		include /etc/letsencrypt/options-ssl-nginx.conf;
+		ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+		root ${dir};
+		index index.html;
+		location / {
+			try_files $uri $uri/ =404;
+		}
+	}`
 
 	fs.writeFile( dir +'/'+ project.filesPath, nginxFile, function (err) {
 		if (err) throw err;
@@ -186,7 +213,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 			}
 		}else{
 
-			console.log(req.body)
+			// console.log(req.body)
 			// res.success('Settings Updated', {name: 'test', description: 'test', id: 1, domainName: 'test'})
 
 			// return

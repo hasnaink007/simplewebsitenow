@@ -93,7 +93,7 @@ class EditorComponent extends Component {
 					
 					<div className="dashboard_header">
 						<h2>Projects <small>({this.context.projects.length})</small></h2>
-						<button onClick={e => this.settings({pages: []})}>Add Project</button>
+						{/* <button onClick={e => this.settings({pages: []})}>Add Project</button> */}
 					</div>
 					
 					<div className="dashboard_projects">

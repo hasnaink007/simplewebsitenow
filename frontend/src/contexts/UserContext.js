@@ -68,9 +68,11 @@ class UserContextProvider extends Component {
 			this.setState({...this.state, user: { ...this.state.user, ...res.user }})
 
 			toast.update(toastID, {...toastOptions, type: res.res, render: res.text})
+			return true
 		}catch(e){
 			console.log(e)
 			toast.update(toastID, {...toastOptions, type: 'error', render: 'An Error occored while saving your settings.'})
+			return false
 		}
 	}
 

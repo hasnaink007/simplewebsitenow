@@ -18,6 +18,7 @@ import AuthenticatedAccess from './AuthenticatedAccess';
 import Login from 'pages/Login/Login';
 import Dashboard from 'pages/Dashboard/Dashboard';
 import Editor from 'pages/Editor/Editor';
+import Settings from 'pages/Settings/Settings';
 import NotFound from 'pages/NotFound/NotFound';
 import About from './pages/About/About';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
@@ -50,6 +51,11 @@ ReactDOM.render(
 					<Route exact path="/admin_links" element={
 						<AuthenticatedAccess>
 							<AdminLinks />
+						</AuthenticatedAccess>
+					} />
+					<Route exact path="/settings" element={
+						<AuthenticatedAccess>
+							<Settings />
 						</AuthenticatedAccess>
 					} />
 					{<Route exact path="/editor/:id" element={
