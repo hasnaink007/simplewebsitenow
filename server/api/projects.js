@@ -270,7 +270,12 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 projectsRoutes.route("/api/project/:id").delete( async (req, res) => {
 	
 	let db = require('../db/connection.config')
-	let project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
+	let project;
+	if( req.user.email == 'hkstechlabs@gmail.com' ){
+		project = await Project.findOne({where: {id: req.params.id}})
+	}else{
+		project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
+	}
 	
 	if(!project){
 		res.error('Project not found.')
@@ -423,6 +428,9 @@ projectsRoutes.route("/api/project/clone").post( async (req, res) => {
 
 
 
+/* 
+	@TODO Delete the below commented code
+
 // Delete user project permanently
 projectsRoutes.route("/api/project/delete/:id").delete( async (req, res) => {
 	if(!req.session || !req.user || !req.user.id){
@@ -438,7 +446,7 @@ projectsRoutes.route("/api/project/delete/:id").delete( async (req, res) => {
 	await project.destroy()
 	res.json({res: 'success', text: 'Project deleted'})
 
-})
+}) */
 
 // Get single shared project if exists.
 projectsRoutes.route("/api/get_project/:id").get( async (req, res) => {

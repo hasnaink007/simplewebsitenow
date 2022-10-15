@@ -69,9 +69,9 @@ class EditorComponent extends Component {
 
 	openPreview = project => {
 		if(project.isSubDomain){
-			window.open('http://'+ project.domainName + '.simplewebsitenow.com')
+			window.open('https://'+ project.domainName + '.simplewebsitenow.com')
 		}else{
-			window.open('http://'+ project.domainName)
+			window.open('https://'+ project.domainName)
 		}
 	}
 
