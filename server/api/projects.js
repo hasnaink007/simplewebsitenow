@@ -16,19 +16,19 @@ projectsRoutes.route("/api/projects").get( async (req, res) => {
 	}
 	let ownerID = req.user.id
 	let projects = []
-	if(req.user.email == 'hkstechlabs@gmail.com'){
+	/* if(req.user.email == 'hkstechlabs@gmail.com'){
 
 		projects = await Project.findAll({
 			order: [['createdAt', 'ASC']],
 			attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
 		})
-	}else{
+	}else{ */
 		projects = await Project.findAll({
 			where: { ownerID },
 			order: [['createdAt', 'ASC']],
 			attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
 		})
-	}
+	// }
 	for( let i = 0; i < projects.length; i++ ){
 		let pages = await Page.findAll({
 			where : {projectID: projects[i].id},
@@ -270,12 +270,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 projectsRoutes.route("/api/project/:id").delete( async (req, res) => {
 	
 	let db = require('../db/connection.config')
-	let project;
-	if( req.user.email == 'hkstechlabs@gmail.com' ){
-		project = await Project.findOne({where: {id: req.params.id}})
-	}else{
-		project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
-	}
+	let project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
 	
 	if(!project){
 		res.error('Project not found.')

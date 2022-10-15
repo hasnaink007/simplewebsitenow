@@ -24,16 +24,7 @@ pagesRoutes.route("/api/pages/:id").get( async (req, res) => {
 		res.error('',[{}])
 		return
 	}
-	// let project = await Project.findOne({where:{id: req.params.id, ownerID: req.user.id}})
-
-	let project;
-	if( req.user.email == 'hkstechlabs@gmail.com' ){
-		project = await Project.findOne({where: {id: req.params.id}})
-	}else{
-		project = await Project.findOne({where: {id: req.params.id, ownerID: req.user.id}})
-	}
-
-
+	let project = await Project.findOne({where:{id: req.params.id, ownerID: req.user.id}})
 	if(!project){
 		res.error('Not Authorized', [{}])
 		return
