@@ -15,11 +15,20 @@ projectsRoutes.route("/api/projects").get( async (req, res) => {
 		return
 	}
 	let ownerID = req.user.id
-	let projects = await Project.findAll({
-		where: {ownerID },
-		order: [['createdAt', 'ASC']],
-		attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
-	})
+	let projects = []
+	if(req.user.email == 'hkstechlabs@gmail.com'){
+
+		projects = await Project.findAll({
+			order: [['createdAt', 'ASC']],
+			attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
+		})
+	}else{
+		projects = await Project.findAll({
+			where: { ownerID },
+			order: [['createdAt', 'ASC']],
+			attributes: ['id', 'createdAt', 'description', 'domainName', 'id', 'isSubDomain', 'name', 'ownerID', 'updatedAt']
+		})
+	}
 	for( let i = 0; i < projects.length; i++ ){
 		let pages = await Page.findAll({
 			where : {projectID: projects[i].id},
@@ -167,7 +176,7 @@ projectsRoutes.route("/api/project/save").post( async (req, res) => {
 		if(req.body.pid){
 			let project = await Project.findOne({where: {id: req.body.pid} })
 			
-			if(project && project.ownerID && req.user && req.user.id && Number(project.ownerID) == Number(req.user.id)){
+			if(project && project.ownerID && req.user && req.user.id && (Number(project.ownerID) == Number(req.user.id) || req.user.email == 'hkstechlabs@gmail.com' ) ){
 				project.name = req.body.name
 				project.description = req.body.description
 				project.domainName = domainName
