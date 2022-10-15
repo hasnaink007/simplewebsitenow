@@ -80,7 +80,7 @@ pagesRoutes.route("/api/page/save").post( async (req, res) => {
 					return
 				}
 
-				let pageFileName = page.name +'.html'
+				let pageFileName = (page.type == 'index' ? 'index' : page.name) +'.html'
 				
 				page.title = req.body.title //.replace(/[^a-zA-Z0-9 _\-\!\#\$\%\^\&\*]/ig, '').slice(0, 100) || page.title;
 				page.name = req.body.name.replace(/\s/ig, '_').replace(/[^a-zA-Z0-9_]/ig, '').slice(0, 50) || page.name

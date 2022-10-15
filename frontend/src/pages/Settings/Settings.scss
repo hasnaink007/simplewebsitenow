@@ -1,0 +1,83 @@
+@import "utils/theme.scss";
+
+.settings{
+    position: relative;
+
+    .settings_header{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: $primary;
+        margin: 0 -20px 20px;
+        padding: 0 20px;
+        
+        button{
+            max-height: 45px;
+        }
+    }
+
+    .settings_user{
+
+      h3{
+        color: #555;
+      }
+    }
+
+    form{
+        .bi_columns{
+            color: #444;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 13px;
+            margin-top: 20px;
+
+            input{
+                width: 100%;
+                font-size: 16px;
+                height: 45px;
+                padding: 10px;
+                margin-top: 3px;
+                border-radius: 7px;
+                border: 1px solid #ccc;
+
+                &:focus{
+                    outline: 2px solid $secondary-dim;
+                }
+            }
+
+            
+            .vip_user_label{
+                font-size: 18px;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+
+                svg{
+                    font-size: 22px;
+                    color: #ccc;
+                }
+                
+                &.yes{
+                    svg{
+                        color: $secondary;
+                    }
+                }
+            }
+        }
+        
+        .change_pass{
+            margin-top: 15px;
+            display: block;
+            color: #555;
+        }
+
+        button{
+            display: block;
+            margin-top: 15px;
+            margin-left: auto;
+            width: 100%;
+        }
+
+    }
+}
